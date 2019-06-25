@@ -44,6 +44,7 @@ In the extensions section of the `config/admin.php` file, add configurations
 ```
 
 In the `resources/lang/zh-CN(example).json` file, add configurations
+
 在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
 ```
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。"
