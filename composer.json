@@ -19,7 +19,7 @@
     "require": {
         "php": ">=7.1.0",
         "ext-json": "*",
-        "encore/laravel-admin": "~1.7"
+        "encore/laravel-admin": "~1.6"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.0"
