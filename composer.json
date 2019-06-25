@@ -1,6 +1,6 @@
 {
     "name": "asundust/auth-captcha",
-    "description": "Add Tencent auth sliding captcha for laravel-admin",
+    "description": "Add Tencent sliding captcha for laravel-admin auth",
     "type": "library",
     "keywords": [
         "laravel-admin",
