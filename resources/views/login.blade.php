@@ -7,11 +7,11 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    @if(!is_null($favicon = Admin::favicon()))
+    @if(Encore\Admin\Admin::VERSION >= '1.7.0' && !is_null($favicon = Admin::favicon()))
         <link rel="shortcut icon" href="{{$favicon}}">
-@endif
+    @endif
 
-<!-- Bootstrap 3.3.5 -->
+    <!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/css/bootstrap.min.css") }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/font-awesome/css/font-awesome.min.css") }}">
@@ -89,7 +89,6 @@
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" id="ticket" name="ticket" value="">
                     <input type="hidden" id="randstr" name="randstr" value="">
-                    {{--                    <button type="submit" class="btn btn-primary btn-block btn-flat">{{ trans('admin.login') }}</button>--}}
                     <button type="button"
                             class="btn btn-primary btn-block btn-flat"
                             id="TencentCaptcha"
