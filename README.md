@@ -1,6 +1,6 @@
-Tencent Auth Sliding Captcha for laravel-admin
+Tencent sliding captcha for laravel-admin auth
 ======
-Tencent Auth sliding captcha for laravel-admin
+Tencent sliding captcha for laravel-admin auth
 
 laravel-admin登陆 腾讯滑动验证插件
 
