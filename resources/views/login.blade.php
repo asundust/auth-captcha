@@ -92,7 +92,7 @@
                     <button type="button"
                             class="btn btn-primary btn-block btn-flat"
                             id="TencentCaptcha"
-                            data-appid="2051477329"
+                            data-appid="{{ config('admin.extensions.auth-captcha.appid') }}"
                             data-cbfn="callback"
                     >{{ trans('admin.login') }}</button>
                 </div>
