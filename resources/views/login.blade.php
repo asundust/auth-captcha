@@ -111,7 +111,7 @@
 <script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/js/bootstrap.min.js")}}"></script>
 <!-- iCheck -->
 <script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/icheck.min.js")}}"></script>
-<!-- 验证码 -->
+<!-- TCaptcha -->
 <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
 <script>
     $(function () {
@@ -120,14 +120,20 @@
             radioClass: 'iradio_square-blue',
             increaseArea: '20%' // optional
         });
+
         window.callback = function (res) {
-            console.log(res);
             if (res.ret === 0) {
                 $('#ticket').attr('value', res.ticket);
                 $('#randstr').attr('value', res.randstr);
                 $('#auth-login').submit();
             }
-        }
+        };
+
+        $('#auth-login').bind('keyup', function (event) {
+            if (event.keyCode === 13) {
+                $('#TencentCaptcha').click();
+            }
+        });
     });
 </script>
 </body>
