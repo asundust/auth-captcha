@@ -11,6 +11,10 @@ laravel-admin登陆 腾讯滑动验证插件
 
 ### Secret Key / 密钥
 
+**目前腾讯暂停申请验证码，已申请的可以继续使用，请等待本插件更新**
+
+[腾讯防水墙声明](https://007.qq.com/help.html?ADTAG=index.head)
+
 Visit [https://007.qq.com/captcha/](https://007.qq.com/captcha/)
 
 访问 [https://007.qq.com/captcha/](https://007.qq.com/captcha/)
