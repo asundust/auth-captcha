@@ -37,11 +37,21 @@ In the extensions section of the `config/admin.php` file, add configurations
          
          // configuration
          // 密钥配置
-         'appid'  => 'xxxxxx',
-         'secret' => 'xxxxxx',
+         'appid' => env('AUTH_CAPTCHA_APPID'),
+         'secret' => env('AUTH_CAPTCHA_SECRET'),
     ],
 ]
 ```
+
+
+In the `.env` file, add configurations
+
+在`.env`文件下加入
+```
+AUTH_CAPTCHA_APPID=xxxxxx
+AUTH_CAPTCHA_SECRET=xxxxxx
+```
+
 
 In the `resources/lang/zh-CN(example).json` file, add configurations
 
@@ -56,6 +66,17 @@ In the `resources/lang/zh-CN(example).json` file, add configurations
 Open your login page in your browser
 
 在浏览器里打开laravel-admin登陆页
+
+### Future / 未来
+
+加入回车键调用
+
+加入表单验证
+
+
+Add Enter Key to Monitor
+
+Add form validation
 
 
 ### License
