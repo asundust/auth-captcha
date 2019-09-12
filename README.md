@@ -82,6 +82,9 @@ Open your login page in your browser
 
 - Add more Sliding validation
 
+### Change Log / 更新日志
+
+[CHANGE_LOG.md](CHANGE_LOG.md)
 
 ### License
 
