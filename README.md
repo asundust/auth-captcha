@@ -25,9 +25,9 @@ composer require asundust/auth-captcha
 
 ### Configuration / 配置
 
-In the extensions section of the `config/admin.php` file, add configurations
+- In the extensions section of the `config/admin.php` file, add configurations
 
-在`config/admin.php` 文件里加入如下配置。
+- 在`config/admin.php` 文件里加入如下配置。
 ```
 'extensions' => [
      'auth-captcha' => [
@@ -44,18 +44,18 @@ In the extensions section of the `config/admin.php` file, add configurations
 ```
 
 
-In the `.env` file, add configurations
+- In the `.env` file, add configurations
 
-在`.env`文件下加入
+- 在`.env`文件下加入
 ```
 AUTH_CAPTCHA_APPID=xxxxxx
 AUTH_CAPTCHA_SECRET=xxxxxx
 ```
 
 
-In the `resources/lang/zh-CN(example).json` file, add configurations
+- In the `resources/lang/zh-CN(example).json` file, add configurations
 
-在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
+- 在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
 ```
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。"
 ```
@@ -69,14 +69,18 @@ Open your login page in your browser
 
 ### Future / 未来
 
-加入回车键调用
+- ~~加入回车键监听~~:heavy_check_mark:
 
-加入表单验证
+- 加入表单验证
+
+- 加入更多滑动验证码
 
 
-Add Enter Key to Monitor
+- ~~Add Enter Key to Monitor~~:heavy_check_mark:
 
-Add form validation
+- Add form validation
+
+- Add more Sliding validation
 
 
 ### License

@@ -9,9 +9,9 @@
 
     @if(Encore\Admin\Admin::VERSION >= '1.7.0' && !is_null($favicon = Admin::favicon()))
         <link rel="shortcut icon" href="{{$favicon}}">
-    @endif
+@endif
 
-    <!-- Bootstrap 3.3.5 -->
+<!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/css/bootstrap.min.css") }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/font-awesome/css/font-awesome.min.css") }}">
@@ -31,13 +31,13 @@
       @if(config('admin.login_background_image'))style="background: url({{config('admin.login_background_image')}}) no-repeat;background-size: cover;"@endif>
 <div class="login-box">
     <div class="login-logo">
-        <a href="{{ admin_base_path('/') }}"><b>{{config('admin.name')}}</b></a>
+        <a href="{{ admin_url('/') }}"><b>{{config('admin.name')}}</b></a>
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
         <p class="login-box-msg">{{ trans('admin.login') }}</p>
 
-        <form action="{{ admin_base_path('auth/login') }}" method="post" id="auth-login">
+        <form action="{{ admin_url('auth/login') }}" method="post" id="auth-login">
             <div class="form-group has-feedback {!! !$errors->has('username') ?: 'has-error' !!}">
 
                 @if($errors->has('username'))
@@ -65,12 +65,14 @@
             </div>
             <div class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
                  style="margin-bottom: 0;">
+
                 @if($errors->has('captcha'))
                     @foreach($errors->get('captcha') as $message)
                         <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}
                         </label><br>
                     @endforeach
                 @endif
+
             </div>
             <div class="row">
                 <div class="col-xs-8">
