@@ -71,8 +71,9 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### 未来
 - ~~加入回车键监听~~:heavy_check_mark:
-- 加入表单验证
 - 加入更多滑动验证码([~~腾讯防水墙~~](https://007.qq.com/product.html?ADTAG=index.head):heavy_check_mark:、[网易](http://dun.163.com/product/captcha)、[极验](http://www.geetest.com/)、[~~顶象~~](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:）【有主流的未发现的，额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)】
+- 加入表单验证
+- 验证码功能模块化，提供给Laravel项目内使用（该想法实现有点难度，看着办吧）
 
 ### 升级注意事项
 [UPGRADE.md](UPGRADE.md)
@@ -82,4 +83,3 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### License
 [The MIT License (MIT)](https://opensource.org/licenses/MIT)
-
