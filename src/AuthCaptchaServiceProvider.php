@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthCaptcha;
+namespace Asundust\AuthCaptcha;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -11,8 +11,8 @@ class AuthCaptchaServiceProvider extends ServiceProvider
      */
     public function boot(AuthCaptcha $extension)
     {
-        if (!AuthCaptcha::boot()) {
-            return;
+        if (! AuthCaptcha::boot()) {
+            return ;
         }
 
         if ($views = $extension->views()) {
@@ -27,7 +27,7 @@ class AuthCaptchaServiceProvider extends ServiceProvider
         }
 
         $this->app->booted(function () {
-            AuthCaptcha::routes(__DIR__ . '/../routes/web.php');
+            AuthCaptcha::routes(__DIR__.'/../routes/web.php');
         });
     }
 }

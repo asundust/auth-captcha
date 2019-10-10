@@ -1,0 +1,56 @@
+Sliding captcha for laravel-admin auth
+======
+Sliding captcha for laravel-admin auth
+
+**For more details, please read [README.md](README.md)**
+
+### Screen Shot
+![img](https://github.com/asundust/images/blob/master/images/auth-captcha-screenshot.png?raw=true)
+
+
+### Installation
+```
+composer require asundust/auth-captcha
+```
+
+
+### Configuration
+- In the extensions section of the `config/admin.php` file, add configurations
+```
+'extensions' => [
+     'auth-captcha' => [
+         // set to false if you want to disable this extension
+         'enable' => true,
+         'provider' => 'tencent', // can use `tencent`、`dingxiang`
+         // configuration
+         'appid' => env('AUTH_CAPTCHA_APPID'),
+         'secret' => env('AUTH_CAPTCHA_SECRET'),
+         'ext_config' => [],
+    ],
+]
+```
+
+- In the `.env` file, add configurations
+```
+AUTH_CAPTCHA_APPID=xxxxxx
+AUTH_CAPTCHA_SECRET=xxxxxx
+```
+
+- In the `resources/lang/zh-CN(example).json` file, add configurations
+```
+"Sliding validation failed. Please try again.": "滑动验证未通过，请重试。"
+```
+
+
+### Usage
+Open your login page in your browser
+
+### Notices for upgrading
+[UPGRADE.md](UPGRADE.md)
+
+### Change Log
+[CHANGE_LOG.md](CHANGE_LOG.md)
+
+### License
+[The MIT License (MIT)](https://opensource.org/licenses/MIT)
+

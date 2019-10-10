@@ -1,8 +1,9 @@
 <?php
 
-namespace AuthCaptcha\Http\Controllers;
+namespace Asundust\AuthCaptcha\Http\Controllers;
 
-use AuthCaptcha\AuthCaptcha;
+use Asundust\AuthCaptcha\AuthCaptcha;
+use Asundust\AuthCaptcha\SDK\Dingxiang\CaptchaClient;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ class AuthCaptchaController extends BaseAuthController
 {
     use ThrottlesLogins;
 
-    public $url = 'https://ssl.captcha.qq.com/ticket/verify';
+    public $captchaProvider;
     public $captchaAppid;
     public $captchaSecret;
 
@@ -20,6 +21,7 @@ class AuthCaptchaController extends BaseAuthController
      */
     public function __construct()
     {
+        $this->captchaProvider = AuthCaptcha::config('provider');
         $this->captchaAppid = AuthCaptcha::config('appid');
         $this->captchaSecret = AuthCaptcha::config('secret');
     }
@@ -29,24 +31,53 @@ class AuthCaptchaController extends BaseAuthController
         if ($this->guard()->check()) {
             return redirect($this->redirectPath());
         }
-        return view('auth-captcha::login');
+        return view('auth-captcha::' . $this->captchaProvider . '.login');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed
+     */
     public function postLogin(Request $request)
     {
-        if (empty($request->input('ticket')) || empty($request->input('randstr'))) {
+        switch ($this->captchaProvider) {
+            case 'tencent':
+                return $this->captchaValidateTencent($request);
+                break;
+            case 'dingxiang':
+                return $this->captchaValidateDingxiang($request);
+                break;
+
+            default:
+                return back()->withInput()->withErrors(['captcha' => __('Error')]);
+                break;
+        }
+    }
+
+    /**
+     * Tencent Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateTencent(Request $request)
+    {
+        $ticket = $request->input('ticket', '');
+        $randstr = $request->input('randstr', '');
+        if (empty($ticket) || empty($randstr)) {
             return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
         }
 
         $params = [
             'aid' => $this->captchaAppid,
             'AppSecretKey' => $this->captchaSecret,
-            'Ticket' => $request->input('ticket'),
-            'Randstr' => $request->input('randstr'),
+            'Ticket' => $ticket,
+            'Randstr' => $randstr,
             'UserIP' => $request->getClientIp()
         ];
 
-        $content = $this->txCurl($this->url . '?' . http_build_query($params));
+        $url = 'https://ssl.captcha.qq.com/ticket/verify';
+        $content = $this->txCurl($url . '?' . http_build_query($params));
         $result = json_decode($content, true);
 
         if (!$result) {
@@ -56,6 +87,40 @@ class AuthCaptchaController extends BaseAuthController
             return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
         }
 
+        return $this->loginValidate($request);
+    }
+
+    /**
+     * Dingxiang Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateDingxiang(Request $request)
+    {
+        $token = $request->input('token', '');
+        if (empty($token)) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        $client = new CaptchaClient($this->captchaAppid, $this->captchaSecret);
+        $client->setTimeOut(2);
+        $response = $client->verifyToken($token);
+
+        if ($response->serverStatus == 'SERVER_SUCCESS' && $response->result) {
+            return $this->loginValidate($request);
+        }
+        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+    }
+
+    /**
+     * Login Validate
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function loginValidate(Request $request)
+    {
         $this->loginValidator($request->all())->validate();
 
         $credentials = $request->only([$this->username(), 'password']);
@@ -72,10 +137,11 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * curl
+     *
      * @param $url
      * @return bool|string
      */
-    public function txCurl($url)
+    private function txCurl($url)
     {
         $curl = curl_init();
         $timeout = 5;

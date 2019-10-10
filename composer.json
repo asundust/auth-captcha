@@ -1,6 +1,6 @@
 {
     "name": "asundust/auth-captcha",
-    "description": "Tencent sliding captcha for laravel-admin auth / laravel-admin登陆 腾讯滑动验证插件",
+    "description": "Sliding captcha for laravel-admin auth / laravel-admin登陆 滑动验证插件",
     "type": "library",
     "keywords": [
         "laravel-admin",
@@ -26,13 +26,13 @@
     },
     "autoload": {
         "psr-4": {
-            "AuthCaptcha\\": "src/"
+            "Asundust\\AuthCaptcha\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "AuthCaptcha\\AuthCaptchaServiceProvider"
+                "Asundust\\AuthCaptcha\\AuthCaptchaServiceProvider"
             ]
         }
     }

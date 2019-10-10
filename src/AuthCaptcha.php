@@ -1,6 +1,6 @@
 <?php
 
-namespace AuthCaptcha;
+namespace Asundust\AuthCaptcha;
 
 use Encore\Admin\Extension;
 
