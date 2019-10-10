@@ -17,7 +17,7 @@ laravel-admin登陆 滑动验证插件
 
 #### 顶象
 - 配置代码为`dingxiang`
-- 访问 [https://www.dingxiang-inc.com/](https://www.dingxiang-inc.com/)
+- 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
 
 
 ### 安装
