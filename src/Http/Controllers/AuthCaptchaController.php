@@ -5,6 +5,7 @@ namespace Asundust\AuthCaptcha\Http\Controllers;
 use Asundust\AuthCaptcha\AuthCaptcha;
 use Asundust\AuthCaptcha\SDK\Dingxiang\CaptchaClient;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
+use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 
@@ -47,6 +48,9 @@ class AuthCaptchaController extends BaseAuthController
             case 'dingxiang':
                 return $this->captchaValidateDingxiang($request);
                 break;
+            case 'vaptcha':
+                return $this->captchaValidateVaptcha($request);
+                break;
 
             default:
                 return back()->withInput()->withErrors(['captcha' => __('Error')]);
@@ -77,12 +81,14 @@ class AuthCaptchaController extends BaseAuthController
         ];
 
         $url = 'https://ssl.captcha.qq.com/ticket/verify';
-        $content = $this->txCurl($url . '?' . http_build_query($params));
-        $result = json_decode($content, true);
+        $response = $this->newHttp()->get($url . '?' . http_build_query($params));
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
 
-        if (!$result) {
+        if ($statusCode != 200) {
             return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
         }
+        $result = json_decode($contents, true);
         if ($result['response'] != 1) {
             return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
         }
@@ -114,6 +120,44 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
+     * Vaptcha Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateVaptcha(Request $request)
+    {
+        $token = $request->input('token', '');
+        if (empty($token)) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        $params = [
+            'id' => $this->captchaAppid,
+            'secretkey' => $this->captchaSecret,
+            'token' => $token,
+            'ip' => $request->ip(),
+        ];
+
+        $url = 'http://api.vaptcha.com/v2/validate';
+        $response = $this->newHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['success'] != 1) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        return $this->loginValidate($request);
+    }
+
+    /**
      * Login Validate
      *
      * @param Request $request
@@ -136,22 +180,16 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * curl
+     * Http
      *
-     * @param $url
-     * @return bool|string
+     * @return Client
      */
-    private function txCurl($url)
+    private function newHttp()
     {
-        $curl = curl_init();
-        $timeout = 5;
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
-        $file_contents = curl_exec($curl);
-        curl_close($curl);
-        return $file_contents;
+        return new Client([
+            'timeout' => 5,
+            'verify' => false,
+            'http_errors' => false,
+        ]);
     }
 }

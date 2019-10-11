@@ -2,6 +2,14 @@ laravel-admin登陆 滑动验证插件
 ======
 laravel-admin登陆 滑动验证插件
 
+### 支持
+- [腾讯防水墙](https://007.qq.com/product.html?ADTAG=index.head):heavy_check_mark:
+- [网易](http://dun.163.com/product/captcha)
+- [极验](http://www.geetest.com/)
+- [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
+- [Vaptcha](https://www.vaptcha.com/):heavy_check_mark:（**轻量级业务是免费的，不过该验证码使用难度相对较高**）
+- 有主流的未发现的，额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)
+
 
 ### 截图
 ![img](https://github.com/asundust/images/blob/master/images/auth-captcha-screenshot.png?raw=true)
@@ -10,14 +18,42 @@ laravel-admin登陆 滑动验证插件
 ### 获取密钥
 
 #### 腾讯防水墙
-- 配置代码为`tencent`
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'tencent',
+    'appid' => {AppID},
+    'secret' => {AppSecretKey}',
+],
+```
 - 购买 [https://007.qq.com/product.html?ADTAG=index.head](https://007.qq.com/product.html?ADTAG=index.head)
 - 使用 [https://007.qq.com/captcha/](https://007.qq.com/captcha/)
 - [关于腾讯防水墙收费的声明(终身免费5万次)](https://007.qq.com/help.html?ADTAG=index.head)
 
 #### 顶象
-- 配置代码为`dingxiang`
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'dingxiang',
+    'appid' => {AppID},
+    'secret' => {AppSecret}',
+],
+```
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
+
+#### Vaptcha
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'vaptcha',
+    'appid' => {VID},
+    'secret' => {Key}',
+],
+```
+- 访问 [https://www.vaptcha.com/](https://www.vaptcha.com/)
 
 
 ### 安装
@@ -34,11 +70,11 @@ composer require asundust/auth-captcha
          // 禁用此插件设置为false
          'enable' => true,
          // 验证码供应商
-         'provider' => 'tencent', // 目前可选的有`tencent`、`dingxiang`
+         'provider' => 'tencent', // 目前可选的有`tencent`、`dingxiang`、`vaptcha`
          // 密钥配置
          'appid' => env('AUTH_CAPTCHA_APPID'),
          'secret' => env('AUTH_CAPTCHA_SECRET'),
-         // 额外配置，参见官网文档（目前支持“顶象”）
+         // 额外配置，参见官网文档（目前支持“顶象”、“Vaptcha”）
          'ext_config' => [],
     ],
 ]
@@ -71,7 +107,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### 未来
 - ~~加入回车键监听~~:heavy_check_mark:
-- 加入更多滑动验证码([~~腾讯防水墙~~](https://007.qq.com/product.html?ADTAG=index.head):heavy_check_mark:、[网易](http://dun.163.com/product/captcha)、[极验](http://www.geetest.com/)、[~~顶象~~](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:）【有主流的未发现的，额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)】
+- 加入更多滑动验证码（持续添加ing）
 - 加入表单验证
 - 验证码功能模块化，提供给Laravel项目内使用（该想法实现有点难度，看着办吧）
 
