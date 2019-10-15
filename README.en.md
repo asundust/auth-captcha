@@ -18,14 +18,16 @@ composer require asundust/auth-captcha
 - In the extensions section of the `config/admin.php` file, add configurations
 ```
 'extensions' => [
-     'auth-captcha' => [
-         // set to false if you want to disable this extension
-         'enable' => true,
-         'provider' => 'tencent', // can use `tencent`、`dingxiang`
-         // configuration
-         'appid' => env('AUTH_CAPTCHA_APPID'),
-         'secret' => env('AUTH_CAPTCHA_SECRET'),
-         'ext_config' => [],
+    'auth-captcha' => [
+        // set to false if you want to disable this extension
+        'enable' => true,
+        'provider' => 'xxxxxx',
+        // style of captcha
+        'style' => 'xxxxxx',
+        // configuration
+        'appid' => env('AUTH_CAPTCHA_APPID'),
+        'secret' => env('AUTH_CAPTCHA_SECRET'),
+        'ext_config' => [],
     ],
 ]
 ```
@@ -38,7 +40,8 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 - In the `resources/lang/zh-CN(example).json` file, add configurations
 ```
-"Sliding validation failed. Please try again.": "滑动验证未通过，请重试。"
+"Sliding validation failed. Please try again.": "滑动验证未通过，请重试。",
+"Please complete the validation.": "请完成验证。"
 ```
 
 

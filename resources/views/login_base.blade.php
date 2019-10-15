@@ -20,7 +20,9 @@
     <!-- iCheck -->
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/square/blue.css") }}">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+@yield('css')
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -63,33 +65,7 @@
                 <input type="password" class="form-control" placeholder="{{ trans('admin.password') }}" name="password">
                 <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
-            <div class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
-                 style="margin-bottom: 0;">
-
-                @if($errors->has('captcha'))
-                    @foreach($errors->get('captcha') as $message)
-                        <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}
-                        </label><br>
-                    @endforeach
-                @endif
-
-            </div>
-            <div class="row">
-                <div class="col-xs-8">
-                    @if(config('admin.auth.remember'))
-                        <div class="checkbox icheck">
-                            <label>
-                                <input type="checkbox" name="remember"
-                                       value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
-                                {{ trans('admin.remember_me') }}
-                            </label>
-                        </div>
-                    @endif
-                </div>
-                <!-- /.col -->
             @yield('content')
-            <!-- /.col -->
-            </div>
         </form>
 
     </div>
@@ -111,6 +87,15 @@
             increaseArea: '20%' // optional
         });
     });
+
+    function formValidate() {
+        if ($('#token').attr('value').length === 0) {
+            let errorHtml = '<label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>' + '{{ __('Please complete the validation.') }}' + '</label><br>';
+            $('#captchaError').removeClass('1').addClass('has-error').html(errorHtml);
+            return;
+        }
+        $('#auth-login').submit();
+    }
 </script>
 @yield('js')
 </body>

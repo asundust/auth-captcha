@@ -1,6 +1,6 @@
 @extends('auth-captcha::login_base')
 @section('content')
-    <div class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
+    <div id="captchaError" class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
          style="margin-bottom: 0;">
         @if($errors->has('captcha'))
             @foreach($errors->get('captcha') as $message)
@@ -9,7 +9,9 @@
             @endforeach
         @endif
     </div>
-    <div id="dx"></div>
+    <div class="form-group row">
+        <div class="col-xs-4" id="dingxiangContainer"></div>
+    </div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -34,25 +36,26 @@
 @section('js')
     <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
     <script>
-        let captcha = _dx.Captcha(document.getElementById('dx'),
+        let captcha = _dx.Captcha(document.getElementById('dingxiangContainer'),
             Object.assign({
                     appId: '{{ config('admin.extensions.auth-captcha.appid') }}',
-                    style: 'popup',
+                    style: '{{ config('admin.extensions.auth-captcha.style', 'oneclick') }}',
+                    width: 320,
                     language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
                     success: function (token) {
                         $('#token').attr('value', token);
-                        $('#auth-login').submit();
                     }
                 }, @json(config('admin.extensions.auth-captcha.ext_config', []))
             ));
 
         document.getElementById('loginButton').onclick = function () {
-            captcha.show();
+            formValidate();
         };
 
         $('#auth-login').bind('keyup', function (event) {
             if (event.keyCode === 13) {
-                $('#loginButton').click();
+                formValidate();
+                $('#auth-login').submit();
             }
         });
     </script>
