@@ -36,6 +36,8 @@ composer require asundust/auth-captcha
 ],
 ```
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
+- [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo/)
+- [官网文档地址](https://www.dingxiang-inc.com/docs/detail/captcha)
 
 #### 腾讯防水墙
 - 配置代码如下
@@ -47,9 +49,10 @@ composer require asundust/auth-captcha
     'secret' => {AppSecretKey}',
 ],
 ```
-- 购买 [https://007.qq.com/product.html?ADTAG=index.head](https://007.qq.com/product.html?ADTAG=index.head)
-- 使用 [https://007.qq.com/captcha/](https://007.qq.com/captcha/)
-- [关于腾讯防水墙收费的声明(终身免费5万次)](https://007.qq.com/help.html?ADTAG=index.head)
+- 新用户购买 [https://cloud.tencent.com/product/captcha](https://cloud.tencent.com/product/captcha)
+- 新用户[官方使用文档地址](https://cloud.tencent.com/document/product/1110/36839)
+- 老用户[官方使用文档地址](https://007.qq.com/captcha/#/gettingStart)
+- [关于腾讯防水墙收费的声明(新用户终身免费5万次)](https://007.qq.com/help.html?ADTAG=index.head)
 
 #### Vaptcha
 - 配置代码如下
@@ -63,7 +66,8 @@ composer require asundust/auth-captcha
     'ext_config' => [],
 ],
 ```
-- 访问 [https://www.vaptcha.com/](https://www.vaptcha.com/)
+- 访问 [https://www.vaptcha.com/](https://www.vaptcha.com)
+- 访问 [官方使用文档地址](https://www.vaptcha.com/document/install)
 
 
 ### 配置
