@@ -86,7 +86,7 @@ class AuthCaptchaController extends BaseAuthController
                 break;
         }
 
-        return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle] ?? 'login', [
+        return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle], [
             'captchaAppid' => $this->captchaAppid,
             'captchaStyle' => $this->captchaStyle,
         ]);
