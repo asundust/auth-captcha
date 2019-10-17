@@ -36,7 +36,7 @@
     <script>
         let captcha = _dx.Captcha(document.getElementById('dx'),
             Object.assign({
-                    appId: '{{ config('admin.extensions.auth-captcha.appid') }}',
+                    appId: '{{ $captchaAppid }}',
                     style: 'popup',
                     language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
                     success: function (token) {

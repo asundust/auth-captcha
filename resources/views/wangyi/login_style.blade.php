@@ -1,5 +1,10 @@
 @extends('auth-captcha::login_base')
 @section('content')
+    <style>
+        .yidun_intellisense {
+            width: 320px;
+        }
+    </style>
     <div id="captchaError" class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
          style="margin-bottom: 0;">
         @if($errors->has('captcha'))
@@ -10,7 +15,7 @@
         @endif
     </div>
     <div class="form-group row">
-        <div class="col-xs-4" id="dingxiangContainer"></div>
+        <div class="col-xs-4" id="captchaContainer"></div>
     </div>
     <div class="row">
         <div class="col-xs-8">
@@ -34,28 +39,39 @@
     </div>
 @endsection
 @section('js')
-    <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
+    <script src="//cstaticdun.126.net/load.min.js?t={{ now()->format('YmdHi') }}"></script>
     <script>
-        let captcha = _dx.Captcha(document.getElementById('dingxiangContainer'),
-            Object.assign({
-                    appId: '{{ $captchaAppid }}',
-                    style: '{{ $captchaStyle }}',
-                    width: 320,
-                    language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
-                    success: function (token) {
-                        $('#token').attr('value', token);
+        let captchaIns = null;
+        initNECaptcha(Object.assign({
+                captchaId: '{{ $captchaAppid }}',
+                element: '#captchaContainer',
+                mode: '{{ $captchaStyle }}',
+                width: '320px',
+                lang: '{{ config('app.locale') }}',
+                feedbackEnable: false,
+                onVerify: function (err, data) {
+                    if (err) {
+                        captchaIns.refresh();
+                        return;
                     }
-                }, @json(config('admin.extensions.auth-captcha.ext_config', []))
-            ));
+                    $('#token').attr('value', data.validate);
+                }
+            }, @json(config('admin.extensions.auth-captcha.ext_config', []))
+            ), function onload(instance) {
+                captchaIns = instance;
+            },
+            function onerror(err) {
+                console.log(err);
+            },
+        );
 
-        document.getElementById('loginButton').onclick = function () {
+        $('#loginButton').bind('click', function (event) {
             formValidate();
-        };
+        });
 
         $('#auth-login').bind('keyup', function (event) {
             if (event.keyCode === 13) {
                 formValidate();
-                $('#auth-login').submit();
             }
         });
     </script>

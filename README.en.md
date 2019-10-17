@@ -27,6 +27,7 @@ composer require asundust/auth-captcha
         // configuration
         'appid' => env('AUTH_CAPTCHA_APPID'),
         'secret' => env('AUTH_CAPTCHA_SECRET'),
+        'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'),
         'ext_config' => [],
     ],
 ]
@@ -41,7 +42,8 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 - In the `resources/lang/zh-CN(example).json` file, add configurations
 ```
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。",
-"Please complete the validation.": "请完成验证。"
+"Please complete the validation.": "请完成验证。",
+"Config Error.": "配置错误。"
 ```
 
 

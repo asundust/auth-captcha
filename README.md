@@ -4,10 +4,10 @@ laravel-admin登陆 滑动验证插件
 
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
-- [网易](http://dun.163.com/product/captcha)
-- [极验](http://www.geetest.com/)
-- [腾讯防水墙](https://007.qq.com/product.html?ADTAG=index.head):heavy_check_mark:
-- [Vaptcha](https://www.vaptcha.com/):heavy_check_mark:（**轻量级业务是免费的，不过该验证码使用难度相对较高**）
+- [极验](http://www.geetest.com)
+- [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
+- [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**轻量级业务是免费的，不过该验证码使用难度相对较高**）
+- [网易](http://dun.163.com/product/captcha):heavy_check_mark:
 - 有主流的未发现的，额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)
 
 
@@ -36,7 +36,7 @@ composer require asundust/auth-captcha
 ],
 ```
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
-- [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo/)
+- [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo)
 - [官网文档地址](https://www.dingxiang-inc.com/docs/detail/captcha)
 
 #### 腾讯防水墙
@@ -60,14 +60,31 @@ composer require asundust/auth-captcha
 'auth-captcha' => [
     'enable' => true,
     'provider' => 'vaptcha',
-    'style' => 'invisible', // 隐藏式: invisible 点击式: click 嵌入式: embed (不填写默认invisible)
+    'style' => 'invisible', // 隐藏式(类似popup): invisible 点击式: click 嵌入式: embed (不填写默认invisible)
     'appid' => {VID},
     'secret' => {Key}',
     'ext_config' => [],
 ],
 ```
-- 访问 [https://www.vaptcha.com/](https://www.vaptcha.com)
+- 访问 [https://www.vaptcha.com](https://www.vaptcha.com)
 - 访问 [官方使用文档地址](https://www.vaptcha.com/document/install)
+
+
+#### 网易易盾
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'wangyi',
+    'style' => '', // 注意后台申请的类型！！！ 常规弹出式: popup 常规嵌入式: embed 常规触发式: float 无感绑定按钮：bind 无感点击式: ''(留空，奇葩设定) (不填写默认popup)
+    'appid' => '{captchaId}',
+    'secret' => '{secretId}',
+    'secret_key' => '{secretKey}', // 这里多了一个额外参数，请注意！！！
+    'ext_config' => [],
+],
+```
+- 访问 [http://dun.163.com/product/captcha](http://dun.163.com/product/captcha)
+- 访问 [官方使用文档地址](http://support.dun.163.com/documents/15588062143475712?docId=150401879704260608)
 
 
 ### 配置
@@ -84,6 +101,7 @@ composer require asundust/auth-captcha
         // 密钥配置
         'appid' => env('AUTH_CAPTCHA_APPID'),
         'secret' => env('AUTH_CAPTCHA_SECRET'),
+        'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'), // 网易易盾需要第三个参数！！！
         // 额外配置，参见官网文档（不支持“腾讯防水墙”）
         'ext_config' => [],
     ],
@@ -94,12 +112,14 @@ composer require asundust/auth-captcha
 ```
 AUTH_CAPTCHA_APPID=xxxxxx
 AUTH_CAPTCHA_SECRET=xxxxxx
+AUTH_CAPTCHA_SECRET_KEY=xxxxxx
 ```
 
 - 在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
 ```
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。",
-"Please complete the validation.": "请完成验证。"
+"Please complete the validation.": "请完成验证。",
+"Config Error.": "配置错误。"
 ```
 
 - 额外配置说明，参考顶象的一个配置
@@ -118,7 +138,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### 未来
 - ~~加入回车键监听~~:heavy_check_mark:
-- 加入更多滑动验证码（持续添加ing）
+- 加入更多滑动验证码（持续添加ing）:heavy_check_mark:
 - 加入表单验证
 - 验证码功能模块化，提供给Laravel项目内使用（该想法实现有点难度，看着办吧）
 

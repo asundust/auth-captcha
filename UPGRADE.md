@@ -1,10 +1,14 @@
 **需要改动的升级将会在这里详细说明**
 
-### v2.0.1 -> v2.0.2
-- 新增滑动验证样式功能(无此选项或者不填写将会默认使用弹出)
+### v2.0.1 -> v2.0.3
+- 新增滑动验证样式功能(无此选项或者不填写将会默认使用弹出，例外：网易易盾是无感点击式)
 - 具体参考[README.md#获取密钥](README.md#获取密钥)
 ```
 'style' => 'xxxxxx',
+```
+另外如果是网易易盾的话，需要额外添加一条参数
+```
+'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'),
 ```
 结果如下：
 ```
@@ -15,6 +19,7 @@
         'style' => 'xxxxxx',
         'appid' => env('AUTH_CAPTCHA_APPID'),
         'secret' => env('AUTH_CAPTCHA_SECRET'),
+        'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'),
         'ext_config' => [],
     ],
 ]
@@ -22,12 +27,14 @@
 
 - 另外需要新增翻译，在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
 ```
-"Please complete the validation.": "请完成验证。"
+"Please complete the validation.": "请完成验证。",
+"Config Error.": "配置错误。"
 ```
 结果如下：
 ```
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。",
-"Please complete the validation.": "请完成验证。"
+"Please complete the validation.": "请完成验证。",
+"Config Error.": "配置错误。"
 ```
 
 

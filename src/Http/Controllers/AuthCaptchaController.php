@@ -20,20 +20,25 @@ class AuthCaptchaController extends BaseAuthController
 
     private $providerStyles = [
         'dingxiang' => [
-            'default' => 'login',
             'popup' => 'login',
             'embed' => 'login_style',
             'inline' => 'login_style',
             'oneclick' => 'login_style',
         ],
         'tencent' => [
-            'default' => 'login',
+            'popup' => 'login',
         ],
         'vaptcha' => [
-            'default' => 'login',
             'invisible' => 'login',
             'click' => 'login_style',
             'embed' => 'login_style',
+        ],
+        'wangyi' => [
+            'popup' => 'login',
+            'float' => 'login_style',
+            'embed' => 'login_style',
+            'bind' => 'login',
+            '' => 'login_style',
         ],
     ];
 
@@ -45,7 +50,7 @@ class AuthCaptchaController extends BaseAuthController
         $this->captchaProvider = AuthCaptcha::config('provider');
         $this->captchaAppid = AuthCaptcha::config('appid');
         $this->captchaSecret = AuthCaptcha::config('secret');
-        $this->captchaStyle = !AuthCaptcha::config('style', 'default') ?: 'default';
+        $this->captchaStyle = AuthCaptcha::config('style');
     }
 
     /**
@@ -58,7 +63,33 @@ class AuthCaptchaController extends BaseAuthController
         if ($this->guard()->check()) {
             return redirect($this->redirectPath());
         }
-        return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle]);
+
+        switch ($this->captchaProvider) {
+            case 'dingxiang':
+            case 'tencent':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'popup';
+                }
+                break;
+            case 'vaptcha':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'invisible';
+                }
+                break;
+            case 'wangyi':
+                if ($this->captchaStyle === null) {
+                    $this->captchaStyle = 'popup';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle] ?? 'login', [
+            'captchaAppid' => $this->captchaAppid,
+            'captchaStyle' => $this->captchaStyle,
+        ]);
     }
 
     /**
@@ -79,9 +110,12 @@ class AuthCaptchaController extends BaseAuthController
             case 'vaptcha':
                 return $this->captchaValidateVaptcha($request);
                 break;
+            case 'wangyi':
+                return $this->captchaValidateWangyi($request);
+                break;
 
             default:
-                return back()->withInput()->withErrors(['captcha' => __('Error')]);
+                return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
                 break;
         }
     }
@@ -183,6 +217,72 @@ class AuthCaptchaController extends BaseAuthController
         }
 
         return $this->loginValidate($request);
+    }
+
+    /**
+     * Wangyi Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateWangyi(Request $request)
+    {
+        $token = $request->input('token', '');
+        if (empty($token)) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
+        if (empty($secretKey)) {
+            return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
+        }
+
+        $params = [
+            'captchaId' => $this->captchaAppid,
+            'validate' => $token,
+            'user' => '',
+            'secretId' => $this->captchaSecret,
+            'version' => 'v2',
+            'timestamp' => now()->timestamp . '000',
+            'nonce' => str_random(),
+        ];
+
+        $params['signature'] = $this->wangyiSignature($secretKey, $params);
+
+        $url = 'http://c.dun.163yun.com/api/v2/verify';
+        $response = $this->newHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['result'] === true) {
+            return $this->loginValidate($request);
+        }
+
+        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+    }
+
+    /**
+     * 网易生成签名信息
+     *
+     * @param $secretKey
+     * @param $params
+     * @return string
+     */
+    function wangyiSignature($secretKey, $params)
+    {
+        ksort($params);
+        $str = '';
+        foreach ($params as $key => $value) {
+            $str .= $key . $value;
+        }
+        $str .= $secretKey;
+        return md5($str);
     }
 
     /**

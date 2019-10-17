@@ -87,8 +87,8 @@
     <script src="https://cdn.vaptcha.com/v2.js"></script>
     <script>
         window.vaptcha(Object.assign({
-                vid: '{{ config('admin.extensions.auth-captcha.appid') }}',
-                type: '{{ config('admin.extensions.auth-captcha.style', 'click') }}',
+                vid: '{{ $captchaAppid }}',
+                type: '{{ $captchaStyle }}',
                 container: '#vaptchaContainer',
                 lang: '{{ in_array(config('app.locale'), ['zh-CN', 'en', 'zh-TW']) ? config('app.locale') : 'en' }}',
             }, @json(config('admin.extensions.auth-captcha.ext_config', []))
