@@ -4,7 +4,7 @@ laravel-admin登陆 滑动验证插件
 
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
-- [极验](http://www.geetest.com)
+- [极验(账号试用申请一直无法通过,无奈)](http://www.geetest.com)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
 - [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**轻量级业务是免费的，不过该验证码使用难度相对较高**）
 - [网易](http://dun.163.com/product/captcha):heavy_check_mark:
@@ -147,6 +147,12 @@ AUTH_CAPTCHA_SECRET_KEY=xxxxxx
 
 ### 更新日志
 [CHANGE_LOG.md](CHANGE_LOG.md)
+
+### 支持
+如果觉得这个项目帮你节约了时间，不妨支持一下呗！
+
+![alipay](https://raw.githubusercontent.com/asundust/images/master/images/pay_qrcode_alipay.png)
+![wechat](https://raw.githubusercontent.com/asundust/images/master/images/pay_qrcode_wechat.png)
 
 ### License
 [The MIT License (MIT)](https://opensource.org/licenses/MIT)
