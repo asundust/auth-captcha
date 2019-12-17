@@ -201,7 +201,7 @@ class AuthCaptchaController extends BaseAuthController
             'ip' => $request->ip(),
         ];
 
-        $url = 'http://api.vaptcha.com/v2/validate';
+        $url = 'http://0.vaptcha.com/verify';
         $response = $this->newHttp()->post($url, [
             'form_params' => $params,
         ]);

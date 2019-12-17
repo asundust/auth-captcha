@@ -31,7 +31,7 @@ composer require asundust/auth-captcha
     'provider' => 'dingxiang',
     'style' => 'oneclick', // 弹出式: popup 嵌入式: embed 内联式: inline 触发式: oneclick (不填写默认popup)
     'appid' => {AppID},
-    'secret' => {AppSecret}',
+    'secret' => {AppSecret},
     'ext_config' => [],
 ],
 ```
@@ -46,7 +46,7 @@ composer require asundust/auth-captcha
     'enable' => true,
     'provider' => 'tencent',
     'appid' => {AppID},
-    'secret' => {AppSecretKey}',
+    'secret' => {AppSecretKey},
 ],
 ```
 - 新用户购买 [https://cloud.tencent.com/product/captcha](https://cloud.tencent.com/product/captcha)
@@ -62,7 +62,7 @@ composer require asundust/auth-captcha
     'provider' => 'vaptcha',
     'style' => 'invisible', // 隐藏式(类似popup): invisible 点击式: click 嵌入式: embed (不填写默认invisible)
     'appid' => {VID},
-    'secret' => {Key}',
+    'secret' => {Key},
     'ext_config' => [],
 ],
 ```
@@ -77,9 +77,9 @@ composer require asundust/auth-captcha
     'enable' => true,
     'provider' => 'wangyi',
     'style' => '', // 注意后台申请的类型！！！ 常规弹出式: popup 常规嵌入式: embed 常规触发式: float 无感绑定按钮：bind 无感点击式: ''(留空，奇葩设定) (不填写默认popup)
-    'appid' => '{captchaId}',
-    'secret' => '{secretId}',
-    'secret_key' => '{secretKey}', // 这里多了一个额外参数，请注意！！！
+    'appid' => {captchaId},
+    'secret' => {secretId},
+    'secret_key' => {secretKey}, // 这里多了一个额外参数，请注意！！！
     'ext_config' => [],
 ],
 ```

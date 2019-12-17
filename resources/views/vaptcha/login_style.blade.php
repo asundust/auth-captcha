@@ -84,13 +84,14 @@
     </div>
 @endsection
 @section('js')
-    <script src="https://cdn.vaptcha.com/v2.js"></script>
+    <script src="https://v.vaptcha.com/v3.js"></script>
     <script>
-        window.vaptcha(Object.assign({
+        vaptcha(Object.assign({
                 vid: '{{ $captchaAppid }}',
                 type: '{{ $captchaStyle }}',
                 container: '#vaptchaContainer',
                 lang: '{{ in_array(config('app.locale'), ['zh-CN', 'en', 'zh-TW']) ? config('app.locale') : 'en' }}',
+                offline_server: 'v.vaptcha.com'
             }, @json(config('admin.extensions.auth-captcha.ext_config', []))
         )).then(function (vaptchaObj) {
             vaptchaObj.render();
