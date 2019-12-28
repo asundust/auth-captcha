@@ -28,6 +28,9 @@ class AuthCaptchaController extends BaseAuthController
         'tencent' => [
             'popup' => 'login',
         ],
+        'verify5' => [
+            'default' => 'login_style',
+        ],
         'vaptcha' => [
             'invisible' => 'login',
             'click' => 'login_style',
@@ -64,12 +67,17 @@ class AuthCaptchaController extends BaseAuthController
             return redirect($this->redirectPath());
         }
 
+        $extConfig = [];
         switch ($this->captchaProvider) {
             case 'dingxiang':
             case 'tencent':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'popup';
                 }
+                break;
+            case 'verify5':
+                $extConfig['token'] = $this->getVerify5Token();
+                $this->captchaStyle = 'default';
                 break;
             case 'vaptcha':
                 if (!$this->captchaStyle) {
@@ -89,7 +97,34 @@ class AuthCaptchaController extends BaseAuthController
         return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle], [
             'captchaAppid' => $this->captchaAppid,
             'captchaStyle' => $this->captchaStyle,
+            'extConfig' => $extConfig,
         ]);
+    }
+
+    /**
+     * Get Verify5 Token
+     *
+     * @return bool|string
+     */
+    private function getVerify5Token()
+    {
+        $params = [
+            'appid' => $this->captchaAppid,
+            'timestamp' => now()->timestamp . '000',
+        ];
+        $params['signature'] = $this->getSignature($this->captchaSecret, $params);
+        $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/getToken?' . http_build_query($params);
+        $response = $this->newHttp()->get($url);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return '';
+        }
+        $result = json_decode($contents, true);
+        if ($result['success'] != true) {
+            return '';
+        }
+        return $result['data']['token'];
     }
 
     /**
@@ -106,6 +141,9 @@ class AuthCaptchaController extends BaseAuthController
                 break;
             case 'tencent':
                 return $this->captchaValidateTencent($request);
+                break;
+            case 'verify5':
+                return $this->captchaValidateVerify5($request);
                 break;
             case 'vaptcha':
                 return $this->captchaValidateVaptcha($request);
@@ -182,6 +220,42 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
+     * Verify5 Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    public function captchaValidateVerify5(Request $request)
+    {
+        $token = $request->input('token', '');
+        $verify5Token = $request->input('verify5_token', '');
+        if (empty($token) || empty($verify5Token)) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        $params = [
+            'host' => config('admin.extensions.auth-captcha.host'),
+            'verifyid' => $token,
+            'token' => $verify5Token,
+            'timestamp' => now()->timestamp . '000',
+        ];
+        $params['signature'] = $this->getSignature($this->captchaSecret, $params);
+        $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/verify?' . http_build_query($params);
+        $response = $this->newHttp()->get($url);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['success'] != true) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        return $this->loginValidate($request);
+    }
+
+    /**
      * Vaptcha Captcha
      *
      * @param Request $request
@@ -247,7 +321,7 @@ class AuthCaptchaController extends BaseAuthController
             'nonce' => str_random(),
         ];
 
-        $params['signature'] = $this->wangyiSignature($secretKey, $params);
+        $params['signature'] = $this->getSignature($secretKey, $params);
 
         $url = 'http://c.dun.163yun.com/api/v2/verify';
         $response = $this->newHttp()->post($url, [
@@ -274,7 +348,7 @@ class AuthCaptchaController extends BaseAuthController
      * @param $params
      * @return string
      */
-    function wangyiSignature($secretKey, $params)
+    function getSignature($secretKey, $params)
     {
         ksort($params);
         $str = '';

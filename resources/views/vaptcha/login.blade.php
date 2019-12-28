@@ -4,7 +4,7 @@
          style="margin-bottom: 0;">
         @if($errors->has('captcha'))
             @foreach($errors->get('captcha') as $message)
-                <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}
+                <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{ $message }}
                 </label><br>
             @endforeach
         @endif

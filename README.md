@@ -5,10 +5,12 @@ laravel-admin登陆 滑动验证插件
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验(账号试用申请一直无法通过,无奈)](http://www.geetest.com)
+- [数美](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
-- [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**轻量级业务是免费的，不过该验证码使用难度相对较高**）
+- [V5验证](https://www.verify5.com/index):heavy_check_mark:（**免费版日限500次**）
+- [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**免费，不过该验证码使用难度相对较高**）
 - [网易](http://dun.163.com/product/captcha):heavy_check_mark:
-- 有主流的未发现的，额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)
+- 有主流的未发现的、额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)
 
 
 ### 截图
@@ -30,8 +32,8 @@ composer require asundust/auth-captcha
     'enable' => true,
     'provider' => 'dingxiang',
     'style' => 'oneclick', // 弹出式: popup 嵌入式: embed 内联式: inline 触发式: oneclick (不填写默认popup)
-    'appid' => {AppID},
-    'secret' => {AppSecret},
+    'appid' => '{AppID}',
+    'secret' => '{AppSecret}',
     'ext_config' => [],
 ],
 ```
@@ -45,14 +47,28 @@ composer require asundust/auth-captcha
 'auth-captcha' => [
     'enable' => true,
     'provider' => 'tencent',
-    'appid' => {AppID},
-    'secret' => {AppSecretKey},
+    'appid' => '{AppID}',
+    'secret' => '{AppSecretKey}',
 ],
 ```
 - 新用户购买 [https://cloud.tencent.com/product/captcha](https://cloud.tencent.com/product/captcha)
 - 新用户[官方使用文档地址](https://cloud.tencent.com/document/product/1110/36839)
 - 老用户[官方使用文档地址](https://007.qq.com/captcha/#/gettingStart)
 - [关于腾讯防水墙收费的声明(新用户终身免费5万次)](https://007.qq.com/help.html?ADTAG=index.head)
+
+#### V5验证
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'verify5',
+    'appid' => '{APP ID}',
+    'secret' => '{APP Key}',
+    'host' => '{Host}',
+],
+```
+- 访问 [https://www.verify5.com/console/app/list](https://www.verify5.com/console/app/list)
+- 访问 [官方使用文档地址](https://www.verify5.com/doc/reference)
 
 #### Vaptcha
 - 配置代码如下
@@ -61,8 +77,8 @@ composer require asundust/auth-captcha
     'enable' => true,
     'provider' => 'vaptcha',
     'style' => 'invisible', // 隐藏式(类似popup): invisible 点击式: click 嵌入式: embed (不填写默认invisible)
-    'appid' => {VID},
-    'secret' => {Key},
+    'appid' => '{VID}',
+    'secret' => '{Key}',
     'ext_config' => [],
 ],
 ```
@@ -77,9 +93,9 @@ composer require asundust/auth-captcha
     'enable' => true,
     'provider' => 'wangyi',
     'style' => '', // 注意后台申请的类型！！！ 常规弹出式: popup 常规嵌入式: embed 常规触发式: float 无感绑定按钮：bind 无感点击式: ''(留空，奇葩设定) (不填写默认popup)
-    'appid' => {captchaId},
-    'secret' => {secretId},
-    'secret_key' => {secretKey}, // 这里多了一个额外参数，请注意！！！
+    'appid' => '{captchaId}',
+    'secret' => '{secretId}',
+    'secret_key' => '{secretKey}', // 这里多了一个额外参数，请注意！！！
     'ext_config' => [],
 ],
 ```

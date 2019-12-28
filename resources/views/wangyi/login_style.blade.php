@@ -1,15 +1,17 @@
 @extends('auth-captcha::login_base')
-@section('content')
+@section('css')
     <style>
         .yidun_intellisense {
             width: 320px;
         }
     </style>
+@endsection
+@section('content')
     <div id="captchaError" class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
          style="margin-bottom: 0;">
         @if($errors->has('captcha'))
             @foreach($errors->get('captcha') as $message)
-                <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}
+                <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{ $message }}
                 </label><br>
             @endforeach
         @endif
