@@ -7,9 +7,11 @@ laravel-admin登陆 滑动验证插件
 - [极验(账号试用申请一直无法通过,无奈)](http://www.geetest.com)
 - [数美](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
+- [同盾](https://x.tongdun.cn/product/captcha)
 - [V5验证](https://www.verify5.com/index):heavy_check_mark:（**免费版日限500次**）
 - [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**免费，不过该验证码使用难度相对较高**）
 - [网易](http://dun.163.com/product/captcha):heavy_check_mark:
+- [云片](https://www.yunpian.com/product/captcha):heavy_check_mark:
 - 有主流的未发现的、额外有需求的请[issue](https://github.com/asundust/auth-captcha/issues)
 
 
@@ -101,6 +103,23 @@ composer require asundust/auth-captcha
 ```
 - 访问 [http://dun.163.com/product/captcha](http://dun.163.com/product/captcha)
 - 访问 [官方使用文档地址](http://support.dun.163.com/documents/15588062143475712?docId=150401879704260608)
+
+
+#### 云片
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'yunpian',
+    'style' => '', // flat: 直接嵌入 float: 浮动 dialog: 对话框 external: 外置滑动(拖动滑块时才浮现验证图片，仅适用于滑动拼图验证) (不填写默认dialog) PS：flat和external貌似存在回调bug，不推荐使用
+    'appid' => '{APPID}',
+    'secret' => '{Secret Id}',
+    'secret_key' => '{Secret Key}', // 这里多了一个额外参数，请注意！！！
+    'ext_config' => [],
+],
+```
+- 访问 [https://www.yunpian.com/console/#/captcha/product](https://www.yunpian.com/console/#/captcha/product)
+- 访问 [官方使用文档地址](https://www.yunpian.com/official/document/sms/zh_CN/captcha/captcha_service)
 
 
 ### 配置

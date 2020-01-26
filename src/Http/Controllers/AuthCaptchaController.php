@@ -43,6 +43,12 @@ class AuthCaptchaController extends BaseAuthController
             'bind' => 'login',
             '' => 'login_style',
         ],
+        'yunpian' => [
+            'flat' => 'login_style',
+            'float' => 'login_style',
+            'dialog' => 'login_style',
+            'external' => 'login_style',
+        ],
     ];
 
     /**
@@ -87,6 +93,11 @@ class AuthCaptchaController extends BaseAuthController
             case 'wangyi':
                 if ($this->captchaStyle === null) {
                     $this->captchaStyle = 'popup';
+                }
+                break;
+            case 'yunpian':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'dialog';
                 }
                 break;
 
@@ -150,6 +161,9 @@ class AuthCaptchaController extends BaseAuthController
                 break;
             case 'wangyi':
                 return $this->captchaValidateWangyi($request);
+                break;
+            case 'yunpian':
+                return $this->captchaValidateYunpian($request);
                 break;
 
             default:
@@ -342,7 +356,56 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * 网易生成签名信息
+     * Yunpian Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateYunpian(Request $request)
+    {
+        $token = $request->input('token', '');
+        $authenticate = $request->input('authenticate', '');
+        if (empty($token) || empty($authenticate)) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+
+        $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
+        if (empty($secretKey)) {
+            return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
+        }
+
+        $params = [
+            'authenticate' => $authenticate,
+            'captchaId' => $this->captchaAppid,
+            'token' => $token,
+            'secretId' => $this->captchaSecret,
+            'user' => '',
+            'version' => '1.0',
+            'timestamp' => now()->timestamp . '000',
+            'nonce' => str_random(),
+        ];
+
+        $params['signature'] = $this->getSignature($secretKey, $params);
+
+        $url = 'https://captcha.yunpian.com/v1/api/authenticate';
+        $response = $this->newHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['code'] === 0 && $result['msg'] == 'ok') {
+            return $this->loginValidate($request);
+        }
+
+        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+    }
+
+    /**
+     * 生成签名信息
      *
      * @param $secretKey
      * @param $params

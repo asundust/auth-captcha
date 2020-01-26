@@ -1,6 +1,5 @@
 @extends('auth-captcha::login_base')
 @section('content')
-    {{--    {{ dd($errors) }}--}}
     <div id="captchaError"
          class="form-group has-feedback {!! !$errors->has('captcha') && ($extConfig['token'] ?? '') ?: 'has-error' !!}"
          style="margin-bottom: 0;">

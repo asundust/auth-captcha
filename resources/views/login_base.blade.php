@@ -88,10 +88,15 @@
         });
     });
 
+    function failMessage(message) {
+        let errorHtml = '<label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>' + message + '</label><br>';
+        $('#captchaError').removeClass('1').addClass('has-error').html(errorHtml);
+    }
+
     function formValidate() {
         if ($('#token').attr('value').length === 0) {
-            let errorHtml = '<label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>' + '{{ __('Please complete the validation.') }}' + '</label><br>';
-            $('#captchaError').removeClass('1').addClass('has-error').html(errorHtml);
+            let message = '{{ __('Please complete the validation.') }}';
+            failMessage(message);
             return;
         }
         $('#auth-login').submit();

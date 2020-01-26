@@ -1,6 +1,6 @@
 @extends('auth-captcha::login_base')
 @section('content')
-    <div class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
+    <div id="captchaError" class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
          style="margin-bottom: 0;">
         @if($errors->has('captcha'))
             @foreach($errors->get('captcha') as $message)
