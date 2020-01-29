@@ -163,7 +163,11 @@ composer require asundust/auth-captcha
 ```
 AUTH_CAPTCHA_APPID=xxxxxx
 AUTH_CAPTCHA_SECRET=xxxxxx
-AUTH_CAPTCHA_SECRET_KEY=xxxxxx
+#AUTH_CAPTCHA_SECRET_KEY=xxxxxx
+#AUTH_CAPTCHA_HOST=xxxxxx
+#AUTH_CAPTCHA_DOMAIN=xxxxxx
+#AUTH_CAPTCHA_SCORE=xxxxxx
+#AUTH_CAPTCHA_XXXXXX=xxxxxx
 ```
 
 - 在`resources/lang/zh-CN(example).json` 文件里加入如下配置。
