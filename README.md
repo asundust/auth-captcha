@@ -5,6 +5,7 @@ laravel-admin登陆 滑动验证插件
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验(账号试用申请一直无法通过,无奈)](http://www.geetest.com)
+- [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [数美](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
 - [同盾](https://x.tongdun.cn/product/captcha)
@@ -42,6 +43,22 @@ composer require asundust/auth-captcha
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
 - [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo)
 - [官网文档地址](https://www.dingxiang-inc.com/docs/detail/captcha)
+
+#### Recaptcha v3(谷歌)
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'recaptcha',
+    'appid' => '{site_key}',
+    'secret' => '{secret}',
+    // 'domain' => 'https://www.google.com', // 服务域名，可选，无此选项默认为 https://recaptcha.google.cn
+    // 'score' => '0.5', // 可信任分数，可选，无此选项默认为 0.7
+],
+```
+- 访问 [https://www.google.com/recaptcha/admin/create](https://www.google.com/recaptcha/admin/create) 选择v3版
+- [官网文档地址(前端)](https://developers.google.com/recaptcha/docs/v3)
+- [官网文档地址(后端)](https://developers.google.com/recaptcha/docs/verify/)
 
 #### 腾讯防水墙
 - 配置代码如下
@@ -123,26 +140,25 @@ composer require asundust/auth-captcha
 
 
 ### 配置
-- 在`config/admin.php` 文件里加入如下配置。
+- 在`config/admin.php` 文件里加入上述配置好的文件。
 ```
 'extensions' => [
     'auth-captcha' => [
-        // 禁用此插件设置为false
-        'enable' => true,
-        // 验证码供应商
-        'provider' => 'xxxxxx',
-        // 验证码样式，可无，默认为弹窗，参见官网文档（不支持“腾讯防水墙”）
-        'style' => 'xxxxxx',
-        // 密钥配置
-        'appid' => env('AUTH_CAPTCHA_APPID'),
-        'secret' => env('AUTH_CAPTCHA_SECRET'),
-        'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'), // 网易易盾需要第三个参数！！！
-        // 额外配置，参见官网文档（不支持“腾讯防水墙”）
-        'ext_config' => [],
+        // ...
     ],
 ]
 ```
 
+- 亦可添加ENV配置
+```
+'appid' => env('AUTH_CAPTCHA_APPID'),
+'secret' => env('AUTH_CAPTCHA_SECRET'),
+// 'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'), // 部分需要此第三个参数！！！
+// 'host' => env('AUTH_CAPTCHA_HOST'), // 部分需要此第三个参数！！！
+// 'domain' => env('AUTH_CAPTCHA_DOMAIN'), // 部分需要此第三个参数！！！
+// 'score' => env('AUTH_CAPTCHA_SCORE'), // 部分需要此第三个参数！！！
+// 'xxxxxx' => env('AUTH_CAPTCHA_XXXXXX'), // demo
+```
 - 在`.env`文件下加入
 ```
 AUTH_CAPTCHA_APPID=xxxxxx

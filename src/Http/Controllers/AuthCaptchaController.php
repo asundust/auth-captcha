@@ -3,7 +3,6 @@
 namespace Asundust\AuthCaptcha\Http\Controllers;
 
 use Asundust\AuthCaptcha\AuthCaptcha;
-use Asundust\AuthCaptcha\SDK\Dingxiang\CaptchaClient;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -24,6 +23,9 @@ class AuthCaptchaController extends BaseAuthController
             'embed' => 'login_style',
             'inline' => 'login_style',
             'oneclick' => 'login_style',
+        ],
+        'recaptcha' => [
+            'default' => 'login',
         ],
         'tencent' => [
             'popup' => 'login',
@@ -81,6 +83,11 @@ class AuthCaptchaController extends BaseAuthController
                     $this->captchaStyle = 'popup';
                 }
                 break;
+            case 'recaptcha':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'default';
+                }
+                break;
             case 'verify5':
                 $extConfig['token'] = $this->getVerify5Token();
                 $this->captchaStyle = 'default';
@@ -125,7 +132,7 @@ class AuthCaptchaController extends BaseAuthController
         ];
         $params['signature'] = $this->getSignature($this->captchaSecret, $params);
         $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/getToken?' . http_build_query($params);
-        $response = $this->newHttp()->get($url);
+        $response = $this->captchaHttp()->get($url);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
         if ($statusCode != 200) {
@@ -150,6 +157,9 @@ class AuthCaptchaController extends BaseAuthController
             case 'dingxiang':
                 return $this->captchaValidateDingxiang($request);
                 break;
+            case 'recaptcha':
+                return $this->captchaValidateRecaptcha($request);
+                break;
             case 'tencent':
                 return $this->captchaValidateTencent($request);
                 break;
@@ -167,7 +177,7 @@ class AuthCaptchaController extends BaseAuthController
                 break;
 
             default:
-                return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
+                return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
                 break;
         }
     }
@@ -182,17 +192,68 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         if (empty($token)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+        $tokenArr = array_filter(explode(':', $token));
+        if (count($tokenArr) != 2) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
-        $client = new CaptchaClient($this->captchaAppid, $this->captchaSecret);
-        $client->setTimeOut(2);
-        $response = $client->verifyToken($token);
+        $params = [
+            'appKey' => $this->captchaAppid,
+            'constId' => $tokenArr[1],
+            'sign' => md5($this->captchaSecret . $tokenArr[0] . $this->captchaSecret),
+            'token' => $tokenArr[0],
+        ];
 
-        if ($response->serverStatus == 'SERVER_SUCCESS' && $response->result) {
+        $url = 'https://cap.dingxiang-inc.com/api/tokenVerify';
+        $response = $this->captchaHttp()->get($url . '?' . http_build_query($params));
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['success'] === true) {
             return $this->loginValidate($request);
         }
-        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+    }
+
+    /**
+     * Recaptcha Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateRecaptcha(Request $request)
+    {
+        $token = $request->input('token', '');
+        if (empty($token)) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+
+        $params = [
+            'secret' => $this->captchaSecret,
+            'response' => $token,
+            'remoteip' => $request->ip(),
+        ];
+
+        $url = rtrim(config('admin.extensions.auth-captcha.domain', 'https://www.google.com')) . '/recaptcha/api/siteverify';
+        $response = $this->captchaHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+        $result = json_decode($contents, true);
+        if ($result['success'] === true && $result['score'] >= config('admin.extensions.auth-captcha.score', 0.7)) {
+            return $this->loginValidate($request);
+        }
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
@@ -206,7 +267,7 @@ class AuthCaptchaController extends BaseAuthController
         $ticket = $request->input('ticket', '');
         $randstr = $request->input('randstr', '');
         if (empty($ticket) || empty($randstr)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $params = [
@@ -218,16 +279,16 @@ class AuthCaptchaController extends BaseAuthController
         ];
 
         $url = 'https://ssl.captcha.qq.com/ticket/verify';
-        $response = $this->newHttp()->get($url . '?' . http_build_query($params));
+        $response = $this->captchaHttp()->get($url . '?' . http_build_query($params));
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
         if ($statusCode != 200) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if ($result['response'] != 1) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         return $this->loginValidate($request);
@@ -244,7 +305,7 @@ class AuthCaptchaController extends BaseAuthController
         $token = $request->input('token', '');
         $verify5Token = $request->input('verify5_token', '');
         if (empty($token) || empty($verify5Token)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $params = [
@@ -255,15 +316,15 @@ class AuthCaptchaController extends BaseAuthController
         ];
         $params['signature'] = $this->getSignature($this->captchaSecret, $params);
         $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/verify?' . http_build_query($params);
-        $response = $this->newHttp()->get($url);
+        $response = $this->captchaHttp()->get($url);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
         if ($statusCode != 200) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if ($result['success'] != true) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         return $this->loginValidate($request);
@@ -279,7 +340,7 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         if (empty($token)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $params = [
@@ -290,18 +351,18 @@ class AuthCaptchaController extends BaseAuthController
         ];
 
         $url = 'http://0.vaptcha.com/verify';
-        $response = $this->newHttp()->post($url, [
+        $response = $this->captchaHttp()->post($url, [
             'form_params' => $params,
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
         if ($statusCode != 200) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if ($result['success'] != 1) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         return $this->loginValidate($request);
@@ -317,12 +378,12 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         if (empty($token)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
         if (empty($secretKey)) {
-            return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 
         $params = [
@@ -338,21 +399,21 @@ class AuthCaptchaController extends BaseAuthController
         $params['signature'] = $this->getSignature($secretKey, $params);
 
         $url = 'http://c.dun.163yun.com/api/v2/verify';
-        $response = $this->newHttp()->post($url, [
+        $response = $this->captchaHttp()->post($url, [
             'form_params' => $params,
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
         if ($statusCode != 200) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if ($result['result'] === true) {
             return $this->loginValidate($request);
         }
 
-        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
@@ -366,12 +427,12 @@ class AuthCaptchaController extends BaseAuthController
         $token = $request->input('token', '');
         $authenticate = $request->input('authenticate', '');
         if (empty($token) || empty($authenticate)) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
         if (empty($secretKey)) {
-            return back()->withInput()->withErrors(['captcha' => __('Config Error.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 
         $params = [
@@ -388,20 +449,20 @@ class AuthCaptchaController extends BaseAuthController
         $params['signature'] = $this->getSignature($secretKey, $params);
 
         $url = 'https://captcha.yunpian.com/v1/api/authenticate';
-        $response = $this->newHttp()->post($url, [
+        $response = $this->captchaHttp()->post($url, [
             'form_params' => $params,
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
         if ($statusCode != 200) {
-            return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if ($result['code'] === 0 && $result['msg'] == 'ok') {
             return $this->loginValidate($request);
         }
 
-        return back()->withInput()->withErrors(['captcha' => __('Sliding validation failed. Please try again.')]);
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
@@ -449,12 +510,35 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return Client
      */
-    private function newHttp()
+    private function captchaHttp()
     {
         return new Client([
             'timeout' => 5,
             'verify' => false,
             'http_errors' => false,
         ]);
+    }
+
+    /**
+     * getErrorMessage
+     *
+     * @param $type
+     * @return array|string|null
+     */
+    private function getErrorMessage($type)
+    {
+        switch ($type) {
+            case 'fail':
+                return __('Sliding validation failed. Please try again.');
+                break;
+
+            case 'config':
+                return __('Config Error.');
+                break;
+
+            default:
+                return __('Error');
+                break;
+        }
     }
 }

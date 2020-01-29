@@ -21,7 +21,7 @@ class AuthCaptchaServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole() && $assets = $extension->assets()) {
             $this->publishes(
-                [$assets => public_path('vendor/asundust/auth-captcha')],
+                [$assets => public_path('vendor/laravel-admin-ext/auth-captcha')],
                 'auth-captcha'
             );
         }
