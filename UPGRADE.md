@@ -40,6 +40,7 @@
 
 ### v1.0.3 -> v2.0.0
 - 加入了滑动验证供应商的选择，请在在`config/admin.php` 文件里加入如下配置。
+- 由于更改了命名空间，更新后可能需要执行`composer dump`操作才能正常允许。
 - 具体参考[README.md#获取密钥](README.md#获取密钥)
 ```
 'provider' => 'xxxxxx',
