@@ -32,7 +32,7 @@
     </div>
 @endsection
 @section('js')
-    <script src="{{ rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.google.cn')) }}/recaptcha/api.js?render={{ config('admin.extensions.auth-captcha.appid') }}"></script>
+    <script src="{{ rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) }}/recaptcha/api.js?render={{ config('admin.extensions.auth-captcha.appid') }}"></script>
     <script>
         grecaptcha.ready(function () {
             $('#loginButton').bind('click', function (event) {

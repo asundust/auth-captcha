@@ -4,7 +4,7 @@ laravel-admin登陆 滑动验证插件
 
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
-- [极验(账号试用申请一直无法通过,无奈)](http://www.geetest.com)
+- [极验](http://www.geetest.com)
 - [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [数美](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
@@ -52,7 +52,7 @@ composer require asundust/auth-captcha
     'provider' => 'recaptcha',
     'appid' => '{site_key}',
     'secret' => '{secret}',
-    // 'domain' => 'https://www.google.com', // 服务域名，可选，无此选项默认为 https://recaptcha.google.cn
+    // 'domain' => 'https://www.google.com', // 服务域名，可选，无此选项默认为 https://recaptcha.net
     // 'score' => '0.5', // 可信任分数，可选，无此选项默认为 0.7
 ],
 ```
@@ -151,6 +151,7 @@ composer require asundust/auth-captcha
 
 - 亦可添加ENV配置
 ```
+'enable' => env('AUTH_CAPTCHA_ENABLE'),
 'appid' => env('AUTH_CAPTCHA_APPID'),
 'secret' => env('AUTH_CAPTCHA_SECRET'),
 // 'secret_key' => env('AUTH_CAPTCHA_SECRET_KEY'), // 部分需要此第三个参数！！！
@@ -161,6 +162,7 @@ composer require asundust/auth-captcha
 ```
 - 在`.env`文件下加入
 ```
+AUTH_CAPTCHA_ENABLE=true
 AUTH_CAPTCHA_APPID=xxxxxx
 AUTH_CAPTCHA_SECRET=xxxxxx
 #AUTH_CAPTCHA_SECRET_KEY=xxxxxx

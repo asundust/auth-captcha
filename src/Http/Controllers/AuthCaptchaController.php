@@ -240,7 +240,7 @@ class AuthCaptchaController extends BaseAuthController
             'remoteip' => $request->ip(),
         ];
 
-        $url = rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.google.cn')) . '/recaptcha/api/siteverify';
+        $url = rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) . '/recaptcha/api/siteverify';
         $response = $this->captchaHttp()->post($url, [
             'form_params' => $params,
         ]);
