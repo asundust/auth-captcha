@@ -1,3 +1,6 @@
+### v2.0.8
+- Recaptcha更新：由于`https://recaptcha.google.cn`不可用，更新默认服务网址为`https://recaptcha.net`
+
 ### v2.0.7
 - 添加支持Recaptcha v3(谷歌)
 - 修复顶象的一个bug
