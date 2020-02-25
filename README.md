@@ -6,7 +6,7 @@ laravel-admin登陆 滑动验证插件
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验](http://www.geetest.com)
 - [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
-- [数美](https://www.ishumei.com/product/bs-post-register.html)
+- [~~数美(暂不支持网页)~~](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
 - [同盾](https://x.tongdun.cn/product/captcha)
 - [V5验证](https://www.verify5.com/index):heavy_check_mark:（**免费版日限500次**）
