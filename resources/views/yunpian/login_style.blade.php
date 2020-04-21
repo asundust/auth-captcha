@@ -61,12 +61,12 @@
                     retry();
                 }
             }, @json(config('admin.extensions.auth-captcha.ext_config', []))));
-            $('#auth-login').bind('keyup', function (event) {
+            $('#auth-login').on('keyup', function (event) {
                 if (event.keyCode === 13) {
                     $('#loginButton').click();
                 }
             });
-            $('#loginButton').bind('click', function (event) {
+            $('#loginButton').on('click', function (event) {
                 formValidate();
             });
         };

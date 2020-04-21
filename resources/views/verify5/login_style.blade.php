@@ -45,7 +45,7 @@
             token: "{{ $extConfig['token'] ?? '' }}"
         });
 
-        $('#loginButton').bind('click', function () {
+        $('#loginButton').on('click', function () {
             if ($('input[name=token]').attr('value')) {
                 $('#auth-login').submit();
             } else {
@@ -59,7 +59,7 @@
             }
         });
 
-        $('#auth-login').bind('keyup', function (event) {
+        $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
                 $('#loginButton').click();
             }

@@ -1,10 +1,11 @@
-laravel-admin登陆 滑动验证插件
+laravel-admin登陆 滑动验证插件 多平台支持
 ======
-laravel-admin登陆 滑动验证插件
+laravel-admin登陆 滑动验证插件 多平台支持
 
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验](http://www.geetest.com)
+- [Recaptcha v2(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [~~数美(暂不支持网页)~~](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
@@ -43,6 +44,23 @@ composer require asundust/auth-captcha
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
 - [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo)
 - [官网文档地址](https://www.dingxiang-inc.com/docs/detail/captcha)
+
+#### Recaptcha v2(谷歌)
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'recaptchav2',
+    'style' => 'invisible', // 隐藏式: invisible 复选框: display (不填写默认invisible)
+    'appid' => '{site_key}',
+    'secret' => '{secret}',
+    // 'domain' => 'https://www.google.com', // 服务域名，可选，无此选项默认为 https://recaptcha.net
+],
+```
+- 访问 [https://www.google.com/recaptcha/admin/create](https://www.google.com/recaptcha/admin/create) 选择v3版
+- [官网文档地址(前端)显示](https://developers.google.com/recaptcha/docs/display)
+- [官网文档地址(前端)隐藏](https://developers.google.com/recaptcha/docs/invisible)
+- [官网文档地址(后端)](https://developers.google.com/recaptcha/docs/verify/)
 
 #### Recaptcha v3(谷歌)
 - 配置代码如下

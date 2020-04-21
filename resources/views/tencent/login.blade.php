@@ -45,7 +45,7 @@
             }
         };
 
-        $('#auth-login').bind('keyup', function (event) {
+        $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
                 $('#TencentCaptcha').click();
             }

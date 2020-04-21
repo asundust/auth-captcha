@@ -59,7 +59,7 @@
             },
         );
 
-        $('#loginButton').bind('click', function (event) {
+        $('#loginButton').on('click', function (event) {
             @if ($captchaStyle === 'popup')
                 captchaIns && captchaIns.popUp();
             @else
@@ -67,7 +67,7 @@
             @endif
         });
 
-        $('#auth-login').bind('keyup', function (event) {
+        $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
                 $('#loginButton').click();
             }

@@ -9,7 +9,6 @@
             @endforeach
         @endif
     </div>
-    <div id="dx"></div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -35,7 +34,7 @@
     <script src="{{ rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) }}/recaptcha/api.js?render={{ config('admin.extensions.auth-captcha.appid') }}"></script>
     <script>
         grecaptcha.ready(function () {
-            $('#loginButton').bind('click', function (event) {
+            $('#loginButton').on('click', function (event) {
                 grecaptcha.execute('{{ config('admin.extensions.auth-captcha.appid') }}', {action: 'login'}).then(function (token) {
                     $('#token').attr('value', token);
                     $('#auth-login').submit();
@@ -43,7 +42,7 @@
             });
         });
 
-        $('#auth-login').bind('keyup', function (event) {
+        $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
                 $('#loginButton').click();
             }

@@ -1,4 +1,11 @@
 @extends('auth-captcha::login_base')
+@section('css')
+    <style>
+        .g-recaptcha div {
+            width: 320px !important;
+        }
+    </style>
+@endsection
 @section('content')
     <div id="captchaError" class="form-group has-feedback {!! !$errors->has('captcha') ?: 'has-error' !!}"
          style="margin-bottom: 0;">
@@ -9,9 +16,8 @@
             @endforeach
         @endif
     </div>
-    <div class="form-group row">
-        <div class="col-xs-4" id="dingxiangContainer"></div>
-    </div>
+    <div class="g-recaptcha" data-sitekey="{{ config('admin.extensions.auth-captcha.appid') }}"
+         data-callback="recaptchaCallback" style="text-align: center;margin-bottom: 11px"></div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -34,23 +40,16 @@
     </div>
 @endsection
 @section('js')
-    <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
+    <script src="{{ rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) }}/recaptcha/api.js"
+            async defer></script>
     <script>
-        let captcha = _dx.Captcha(document.getElementById('dingxiangContainer'),
-            Object.assign({
-                    appId: '{{ $captchaAppid }}',
-                    style: '{{ $captchaStyle }}',
-                    width: 320,
-                    language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
-                    success: function (token) {
-                        $('#token').attr('value', token);
-                    }
-                }, @json(config('admin.extensions.auth-captcha.ext_config', []))
-            ));
+        function recaptchaCallback(token) {
+            $('#token').attr('value', token);
+        }
 
-        document.getElementById('loginButton').onclick = function () {
+        $('#loginButton').on('click', function () {
             formValidate();
-        };
+        });
 
         $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {

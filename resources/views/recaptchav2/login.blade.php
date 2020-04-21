@@ -9,9 +9,6 @@
             @endforeach
         @endif
     </div>
-    <div class="form-group row">
-        <div class="col-xs-4" id="dingxiangContainer"></div>
-    </div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -27,34 +24,29 @@
         <div class="col-xs-4">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" id="token" name="token" value="">
-            <button type="button" class="btn btn-primary btn-block btn-flat" id="loginButton">
+            <button type="button" class="btn btn-primary btn-block btn-flat g-recaptcha" id="loginButton"
+                    data-sitekey="{{ config('admin.extensions.auth-captcha.appid') }}"
+                    data-callback="recaptchaCallback">
                 {{ trans('admin.login') }}
             </button>
         </div>
     </div>
 @endsection
 @section('js')
-    <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
+    <script src="{{ rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) }}/recaptcha/api.js"></script>
     <script>
-        let captcha = _dx.Captcha(document.getElementById('dingxiangContainer'),
-            Object.assign({
-                    appId: '{{ $captchaAppid }}',
-                    style: '{{ $captchaStyle }}',
-                    width: 320,
-                    language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
-                    success: function (token) {
-                        $('#token').attr('value', token);
-                    }
-                }, @json(config('admin.extensions.auth-captcha.ext_config', []))
-            ));
+        function recaptchaCallback(token) {
+            $('#token').attr('value', token);
+            $('#auth-login').submit();
+        }
 
-        document.getElementById('loginButton').onclick = function () {
-            formValidate();
-        };
+        $('#loginButton').on('click', function () {
+            grecaptcha.execute();
+        });
 
         $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
-                formValidate();
+                grecaptcha.execute();
             }
         });
     </script>

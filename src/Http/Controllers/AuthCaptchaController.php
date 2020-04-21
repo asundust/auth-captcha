@@ -24,6 +24,10 @@ class AuthCaptchaController extends BaseAuthController
             'inline' => 'login_style',
             'oneclick' => 'login_style',
         ],
+        'recaptchav2' => [
+            'invisible' => 'login',
+            'display' => 'login_style',
+        ],
         'recaptcha' => [
             'default' => 'login',
         ],
@@ -81,6 +85,11 @@ class AuthCaptchaController extends BaseAuthController
             case 'tencent':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'popup';
+                }
+                break;
+            case 'recaptchav2':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'invisible';
                 }
                 break;
             case 'recaptcha':
@@ -157,6 +166,7 @@ class AuthCaptchaController extends BaseAuthController
             case 'dingxiang':
                 return $this->captchaValidateDingxiang($request);
                 break;
+            case 'recaptchav2':
             case 'recaptcha':
                 return $this->captchaValidateRecaptcha($request);
                 break;
@@ -250,8 +260,14 @@ class AuthCaptchaController extends BaseAuthController
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['success'] === true && $result['score'] >= config('admin.extensions.auth-captcha.score', 0.7)) {
-            return $this->loginValidate($request);
+        if ($this->captchaProvider == 'recaptcha') {
+            if ($result['success'] === true && $result['score'] >= config('admin.extensions.auth-captcha.score', 0.7)) {
+                return $this->loginValidate($request);
+            }
+        } else {
+            if ($result['success'] === true) {
+                return $this->loginValidate($request);
+            }
         }
         return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }

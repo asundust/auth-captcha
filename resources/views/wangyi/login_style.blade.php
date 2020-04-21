@@ -67,11 +67,11 @@
             },
         );
 
-        $('#loginButton').bind('click', function (event) {
+        $('#loginButton').on('click', function (event) {
             formValidate();
         });
 
-        $('#auth-login').bind('keyup', function (event) {
+        $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {
                 formValidate();
             }

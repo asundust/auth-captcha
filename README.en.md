@@ -1,6 +1,6 @@
-Sliding captcha for laravel-admin auth
+Sliding captcha for laravel-admin auth, Multiple platform support
 ======
-Sliding captcha for laravel-admin auth
+Sliding captcha for laravel-admin auth, Multiple platform support
 
 **For more details, please read [README.md](README.md)**
 
