@@ -90,7 +90,6 @@
                 vid: '{{ $captchaAppid }}',
                 type: '{{ $captchaStyle }}',
                 container: '#vaptchaContainer',
-                lang: '{{ in_array(config('app.locale'), ['zh-CN', 'en', 'zh-TW']) ? config('app.locale') : 'en' }}',
                 offline_server: 'v.vaptcha.com'
             }, @json(config('admin.extensions.auth-captcha.ext_config', []))
         )).then(function (vaptchaObj) {

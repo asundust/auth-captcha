@@ -4,7 +4,7 @@ laravel-admin登陆 滑动验证插件 多平台支持
 
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
-- [极验](http://www.geetest.com)
+- [极验](http://www.geetest.com):heavy_check_mark:
 - [Recaptcha v2(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [~~数美(暂不支持网页)~~](https://www.ishumei.com/product/bs-post-register.html)
@@ -45,6 +45,25 @@ composer require asundust/auth-captcha
 - [官网文档配置DEMO](https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/demo)
 - [官网文档地址](https://www.dingxiang-inc.com/docs/detail/captcha)
 
+#### 极验
+- **需要发布配置文件**，命令如下
+```
+ php artisan vendor:publish --provider="Asundust\AuthCaptcha\AuthCaptchaServiceProvider"
+```
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'geetest',
+    'style' => 'bind', // 隐藏式: bind 弹出式: popup 浮动式: float 自定区域浮动式(与popup类似，由于登录页面无需自定区域，故效果和popup一样的): custom (不填写默认bind)
+    'appid' => '{ID}',
+    'secret' => '{KEY}',
+    'ext_config' => [],
+],
+```
+- 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
+- [官网文档地址](http://docs.geetest.com/sensebot/deploy/server/php)
+
 #### Recaptcha v2(谷歌)
 - 配置代码如下
 ```
@@ -57,7 +76,7 @@ composer require asundust/auth-captcha
     // 'domain' => 'https://www.google.com', // 服务域名，可选，无此选项默认为 https://recaptcha.net
 ],
 ```
-- 访问 [https://www.google.com/recaptcha/admin/create](https://www.google.com/recaptcha/admin/create) 选择v3版
+- 访问 [https://www.google.com/recaptcha/admin/create](https://www.google.com/recaptcha/admin/create) 选择v2版
 - [官网文档地址(前端)显示](https://developers.google.com/recaptcha/docs/display)
 - [官网文档地址(前端)隐藏](https://developers.google.com/recaptcha/docs/invisible)
 - [官网文档地址(后端)](https://developers.google.com/recaptcha/docs/verify/)

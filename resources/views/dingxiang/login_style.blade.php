@@ -36,21 +36,20 @@
 @section('js')
     <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
     <script>
-        let captcha = _dx.Captcha(document.getElementById('dingxiangContainer'),
+        let captcha = _dx.Captcha($('#dingxiangContainer'),
             Object.assign({
                     appId: '{{ $captchaAppid }}',
                     style: '{{ $captchaStyle }}',
                     width: 320,
-                    language: '{{ config('app.locale') == 'zh-CN' ? 'cn' : 'en' }}',
                     success: function (token) {
                         $('#token').attr('value', token);
                     }
                 }, @json(config('admin.extensions.auth-captcha.ext_config', []))
             ));
 
-        document.getElementById('loginButton').onclick = function () {
+        $('#loginButton').on('click', function (event) {
             formValidate();
-        };
+        });
 
         $('#auth-login').on('keyup', function (event) {
             if (event.keyCode === 13) {

@@ -49,7 +49,6 @@
                 element: '#captchaContainer',
                 mode: '{{ $captchaStyle }}',
                 width: '320px',
-                lang: '{{ config('app.locale') }}',
                 feedbackEnable: false,
                 onVerify: function (err, data) {
                     if (err) {

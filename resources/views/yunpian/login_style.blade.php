@@ -42,8 +42,7 @@
             new YpRiddler(Object.assign({
                 mode: '{{ config('admin.extensions.auth-captcha.style') }}',
                 winWidth: 320,
-                lang: '{{ config('app.locale') == 'zh-CN' ? 'zh-cn' : 'en' }}',
-                container: document.getElementById('yunpianContainer'),
+                container: $('#yunpianContainer'),
                 appId: '{{ config('admin.extensions.auth-captcha.appid') }}',
                 version: 'v1',
                 onError: function (param) {

@@ -1,12 +1,16 @@
 {
     "name": "asundust/auth-captcha",
-    "description": "Sliding captcha for laravel-admin auth / laravel-admin登陆 滑动验证插件",
+    "description": "Sliding captcha for Laravel-Admin auth, Multiple platform support / Laravel-Admin登陆 滑动验证插件 多平台支持",
     "type": "library",
     "keywords": [
         "laravel-admin",
         "extension",
-        "sliding-captcha",
-        "auth-captcha"
+        "sliding captcha",
+        "auth",
+        "login",
+        "captcha",
+        "auth captcha",
+        "multiple platform"
     ],
     "homepage": "https://github.com/asundust/auth-captcha",
     "license": "MIT",
@@ -17,10 +21,11 @@
         }
     ],
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.0.0",
         "ext-json": "*",
         "encore/laravel-admin": "~1.6",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+        "jenssegers/agent": "^2.6"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.0"

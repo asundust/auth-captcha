@@ -9,7 +9,6 @@
             @endforeach
         @endif
     </div>
-    <div id="dingxiangContainer"></div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -24,35 +23,39 @@
         </div>
         <div class="col-xs-4">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" id="token" name="token" value="">
-            <button type="button" class="btn btn-primary btn-block btn-flat" id="loginButton">
+            <button type="button" class="btn btn-primary btn-block btn-flat g-recaptcha" id="loginButton">
                 {{ trans('admin.login') }}
             </button>
         </div>
     </div>
 @endsection
 @section('js')
-    <script src="https://cdn.dingxiang-inc.com/ctu-group/captcha-ui/index.js"></script>
+    <script src="{{ admin_asset('vendor/laravel-admin-ext/auth-captcha/geetest/gt.js') }}"></script>
     <script>
-        let captcha = _dx.Captcha($('#dingxiangContainer'),
-            Object.assign({
-                    appId: '{{ $captchaAppid }}',
-                    style: 'popup',
-                    success: function (token) {
-                        $('#token').attr('value', token);
-                        $('#auth-login').submit();
+        initGeetest(Object.assign({
+                width: '320px',
+                gt: '{{ $extConfig['gt'] }}',
+                challenge: '{{ $extConfig['challenge'] }}',
+                new_captcha: {{ $extConfig['new_captcha'] }},
+                product: 'bind',
+                offline: !{{ $extConfig['success'] }}
+            }, @json(config('admin.extensions.auth-captcha.ext_config', []))
+        ), function (captchaObj) {
+            captchaObj.onReady(function () {
+                $('#loginButton').on('click', function () {
+                    captchaObj.verify();
+                });
+                $('#auth-login').on('keyup', function (event) {
+                    if (event.keyCode === 13) {
+                        captchaObj.verify();
                     }
-                }, @json(config('admin.extensions.auth-captcha.ext_config', []))
-            ));
-
-        $('#loginButton').on('click', function (event) {
-            captcha.show();
-        });
-
-        $('#auth-login').on('keyup', function (event) {
-            if (event.keyCode === 13) {
-                $('#loginButton').click();
-            }
+                });
+            }).onSuccess(function () {
+                captchaObj.bindForm('#auth-login');
+                $('#auth-login').submit();
+            }).onError(function () {
+                //
+            })
         });
     </script>
 @endsection

@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
+use Jenssegers\Agent\Facades\Agent;
 
 class AuthCaptchaController extends BaseAuthController
 {
@@ -23,6 +24,12 @@ class AuthCaptchaController extends BaseAuthController
             'embed' => 'login_style',
             'inline' => 'login_style',
             'oneclick' => 'login_style',
+        ],
+        'geetest' => [
+            'bind' => 'login',
+            'float' => 'login_style',
+            'popup' => 'login_style',
+            'custom' => 'login_style',
         ],
         'recaptchav2' => [
             'invisible' => 'login',
@@ -87,7 +94,14 @@ class AuthCaptchaController extends BaseAuthController
                     $this->captchaStyle = 'popup';
                 }
                 break;
+            case 'geetest':
+                if (!$this->captchaStyle) {
+                    $this->captchaStyle = 'bind';
+                }
+                $extConfig = $this->getGeetestStatus();
+                break;
             case 'recaptchav2':
+            case 'vaptcha':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'invisible';
                 }
@@ -100,11 +114,6 @@ class AuthCaptchaController extends BaseAuthController
             case 'verify5':
                 $extConfig['token'] = $this->getVerify5Token();
                 $this->captchaStyle = 'default';
-                break;
-            case 'vaptcha':
-                if (!$this->captchaStyle) {
-                    $this->captchaStyle = 'invisible';
-                }
                 break;
             case 'wangyi':
                 if ($this->captchaStyle === null) {
@@ -126,6 +135,74 @@ class AuthCaptchaController extends BaseAuthController
             'captchaStyle' => $this->captchaStyle,
             'extConfig' => $extConfig,
         ]);
+    }
+
+    /**
+     * Get Geetest Status
+     *
+     * @return array
+     */
+    private function getGeetestStatus()
+    {
+        $clientType = Agent::isMobile() ? 'h5' : 'web';
+        session(['GeetestAuth-client_type' => $clientType]);
+        $params = [
+            'client_type' => $clientType,
+            'gt' => $this->captchaAppid,
+            'ip_address' => request()->ip(),
+            'new_captcha' => 1,
+            'user_id' => '',
+        ];
+        $url = 'http://api.geetest.com/register.php?' . http_build_query($params);
+        $response = $this->captchaHttp()->get($url);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return $this->geetestFailProcess();
+        }
+        if (strlen($contents) != 32) {
+            return $this->geetestFailProcess();
+        }
+        return $this->geetestSuccessProcess($contents);
+    }
+
+    /**
+     * Geetest Success Process
+     *
+     * @param $challenge
+     * @return array
+     */
+    private function geetestSuccessProcess($challenge)
+    {
+        $challenge = md5($challenge . $this->captchaSecret);
+        $result = [
+            'success' => 1,
+            'gt' => $this->captchaAppid,
+            'challenge' => $challenge,
+            'new_captcha' => 1
+        ];
+        session(['GeetestAuth-gtserver' => 1, 'GeetestAuth-user_id' => '']);
+        return $result;
+    }
+
+    /**
+     * Geetest Fail Process
+     *
+     * @return array
+     */
+    private function geetestFailProcess()
+    {
+        $rnd1 = md5(rand(0, 100));
+        $rnd2 = md5(rand(0, 100));
+        $challenge = $rnd1 . substr($rnd2, 0, 2);
+        $result = [
+            'success' => 0,
+            'gt' => $this->captchaAppid,
+            'challenge' => $challenge,
+            'new_captcha' => 1
+        ];
+        session(['GeetestAuth-gtserver' => 0, 'GeetestAuth-user_id' => 0]);
+        return $result;
     }
 
     /**
@@ -166,6 +243,9 @@ class AuthCaptchaController extends BaseAuthController
             case 'dingxiang':
                 return $this->captchaValidateDingxiang($request);
                 break;
+            case 'geetest':
+                return $this->captchaValidateGeetest($request);
+                break;
             case 'recaptchav2':
             case 'recaptcha':
                 return $this->captchaValidateRecaptcha($request);
@@ -201,7 +281,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateDingxiang(Request $request)
     {
         $token = $request->input('token', '');
-        if (empty($token)) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $tokenArr = array_filter(explode(':', $token));
@@ -232,6 +312,57 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
+     * Geetest Captcha
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    public function captchaValidateGeetest(Request $request)
+    {
+        $geetestChallenge = $request->input('geetest_challenge', '');
+        $geetestValidate = $request->input('geetest_validate', '');
+        $geetestSeccode = $request->input('geetest_seccode', '');
+        if (!$geetestChallenge || !$geetestValidate || !$geetestSeccode) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+
+        if (session('GeetestAuth-gtserver') != 1) {
+            if (md5($geetestChallenge) == $geetestValidate) {
+                return $this->loginValidate($request);
+            }
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+
+        $params = [
+            'challenge' => $geetestChallenge,
+            'client_type' => session('GeetestAuth-client_type'),
+            'gt' => $this->captchaAppid,
+            'ip_address' => $request->ip(),
+            'json_format' => 1,
+            'new_captcha' => 1,
+            'sdk' => 'php_3.0.0',
+            'seccode' => $geetestSeccode,
+            'user_id' => session('GeetestAuth-user_id'),
+            'validate' => $geetestValidate,
+        ];
+
+        $url = 'http://api.geetest.com/validate.php';
+        $response = $this->captchaHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if ($statusCode != 200) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+        $result = json_decode($contents, true);
+        if (is_array($result) && $result['seccode'] == md5($geetestSeccode)) {
+            return $this->loginValidate($request);
+        }
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+    }
+
+    /**
      * Recaptcha Captcha
      *
      * @param Request $request
@@ -240,7 +371,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateRecaptcha(Request $request)
     {
         $token = $request->input('token', '');
-        if (empty($token)) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -282,7 +413,7 @@ class AuthCaptchaController extends BaseAuthController
     {
         $ticket = $request->input('ticket', '');
         $randstr = $request->input('randstr', '');
-        if (empty($ticket) || empty($randstr)) {
+        if (!$ticket || !$randstr) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -320,7 +451,7 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         $verify5Token = $request->input('verify5_token', '');
-        if (empty($token) || empty($verify5Token)) {
+        if (!$token || !$verify5Token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -355,7 +486,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateVaptcha(Request $request)
     {
         $token = $request->input('token', '');
-        if (empty($token)) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -393,12 +524,12 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateWangyi(Request $request)
     {
         $token = $request->input('token', '');
-        if (empty($token)) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
-        if (empty($secretKey)) {
+        if (!$secretKey) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 
@@ -442,12 +573,12 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         $authenticate = $request->input('authenticate', '');
-        if (empty($token) || empty($authenticate)) {
+        if (!$token || !$authenticate) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
-        if (empty($secretKey)) {
+        if (!$secretKey) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 

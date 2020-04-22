@@ -9,7 +9,9 @@
             @endforeach
         @endif
     </div>
-    <div id="captchaContainer"></div>
+    <div class="form-group row">
+        <div class="col-xs-12" id="geetestContainer"></div>
+    </div>
     <div class="row">
         <div class="col-xs-8">
             @if(config('admin.auth.remember'))
@@ -25,51 +27,41 @@
         <div class="col-xs-4">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" id="token" name="token" value="">
-            <button type="button" class="btn btn-primary btn-block btn-flat" id="loginButton">
+            <button type="button" class="btn btn-primary btn-block btn-flat g-recaptcha" id="loginButton">
                 {{ trans('admin.login') }}
             </button>
         </div>
     </div>
 @endsection
 @section('js')
-    <script src="//cstaticdun.126.net/load.min.js?t={{ now()->format('YmdHi') }}"></script>
+    <script src="{{ admin_asset('vendor/laravel-admin-ext/auth-captcha/geetest/gt.js') }}"></script>
     <script>
-        let captchaIns = null;
-        initNECaptcha(Object.assign({
-                captchaId: '{{ $captchaAppid }}',
-                element: '#captchaContainer',
-                mode: '{{ $captchaStyle }}',
+        initGeetest(Object.assign({
                 width: '320px',
-                feedbackEnable: false,
-                onVerify: function (err, data) {
-                    if (err) {
-                        captchaIns.refresh();
-                        return;
-                    }
-                    $('#token').attr('value', data.validate);
-                    $('#auth-login').submit();
-                }
+                next_width: '320px',
+                gt: '{{ $extConfig['gt'] }}',
+                challenge: '{{ $extConfig['challenge'] }}',
+                new_captcha: {{ $extConfig['new_captcha'] }},
+                product: '{{ $captchaStyle }}',
+                offline: !{{ $extConfig['success'] }}
             }, @json(config('admin.extensions.auth-captcha.ext_config', []))
-            ), function onload(instance) {
-                captchaIns = instance;
-            },
-            function onerror(err) {
-                console.log(err);
-            },
-        );
-
-        $('#loginButton').on('click', function (event) {
-            @if ($captchaStyle === 'popup')
-                captchaIns && captchaIns.popUp();
-            @else
-                captchaIns && captchaIns.verify();
-            @endif
-        });
-
-        $('#auth-login').on('keyup', function (event) {
-            if (event.keyCode === 13) {
-                $('#loginButton').click();
-            }
+        ), function (captchaObj) {
+            captchaObj.appendTo("#geetestContainer");
+            captchaObj.onReady(function () {
+                $('#loginButton').on('click', function () {
+                    formValidate();
+                });
+                $('#auth-login').on('keyup', function (event) {
+                    if (event.keyCode === 13) {
+                        formValidate();
+                    }
+                });
+            }).onSuccess(function () {
+                $('#token').attr('value', 1);
+                captchaObj.bindForm('#auth-login');
+            }).onError(function () {
+                $('#token').attr('value', '');
+            })
         });
     </script>
 @endsection
