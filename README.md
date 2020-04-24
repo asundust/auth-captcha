@@ -2,6 +2,9 @@ laravel-admin登陆 滑动验证插件 多平台支持
 ======
 laravel-admin登陆 滑动验证插件 多平台支持
 
+### Demo演示
+[演示站点](https://captcha.leeay.com)
+
 ### 支持
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验](http://www.geetest.com):heavy_check_mark:
@@ -35,7 +38,7 @@ composer require asundust/auth-captcha
 'auth-captcha' => [
     'enable' => true,
     'provider' => 'dingxiang',
-    'style' => 'oneclick', // 弹出式: popup 嵌入式: embed 内联式: inline 触发式: oneclick (不填写默认popup)
+    'style' => 'popup', // 弹出式: popup 嵌入式: embed 内联式: inline 触发式: oneclick (不填写默认popup)
     'appid' => '{AppID}',
     'secret' => '{AppSecret}',
     'ext_config' => [],
@@ -132,7 +135,7 @@ composer require asundust/auth-captcha
 'auth-captcha' => [
     'enable' => true,
     'provider' => 'vaptcha',
-    'style' => 'invisible', // 隐藏式(类似popup): invisible 点击式: click 嵌入式: embed (不填写默认invisible)
+    'style' => 'invisible', // 隐藏式: invisible 点击式: click 嵌入式: embed (不填写默认invisible)
     'appid' => '{VID}',
     'secret' => '{Key}',
     'ext_config' => [],
