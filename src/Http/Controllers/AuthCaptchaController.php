@@ -93,13 +93,13 @@ class AuthCaptchaController extends BaseAuthController
         switch ($this->captchaProvider) {
             case 'dingxiang':
             case 'tencent':
-                if (! $this->captchaStyle) {
+                if (!$this->captchaStyle) {
                     $this->captchaStyle = 'popup';
                 }
 
                 break;
             case 'geetest':
-                if (! $this->captchaStyle) {
+                if (!$this->captchaStyle) {
                     $this->captchaStyle = 'bind';
                 }
                 $extConfig = $this->getGeetestStatus();
@@ -107,13 +107,13 @@ class AuthCaptchaController extends BaseAuthController
                 break;
             case 'recaptchav2':
             case 'vaptcha':
-                if (! $this->captchaStyle) {
+                if (!$this->captchaStyle) {
                     $this->captchaStyle = 'invisible';
                 }
 
                 break;
             case 'recaptcha':
-                if (! $this->captchaStyle) {
+                if (!$this->captchaStyle) {
                     $this->captchaStyle = 'default';
                 }
 
@@ -130,7 +130,7 @@ class AuthCaptchaController extends BaseAuthController
 
                 break;
             case 'yunpian':
-                if (! $this->captchaStyle) {
+                if (!$this->captchaStyle) {
                     $this->captchaStyle = 'dialog';
                 }
 
@@ -307,7 +307,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateDingxiang(Request $request)
     {
         $token = $request->input('token', '');
-        if (! $token) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $tokenArr = array_filter(explode(':', $token));
@@ -350,7 +350,7 @@ class AuthCaptchaController extends BaseAuthController
         $geetestChallenge = $request->input('geetest_challenge', '');
         $geetestValidate = $request->input('geetest_validate', '');
         $geetestSeccode = $request->input('geetest_seccode', '');
-        if (! $geetestChallenge || ! $geetestValidate || ! $geetestSeccode) {
+        if (!$geetestChallenge || !$geetestValidate || !$geetestSeccode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -402,7 +402,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateRecaptcha(Request $request)
     {
         $token = $request->input('token', '');
-        if (! $token) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -446,7 +446,7 @@ class AuthCaptchaController extends BaseAuthController
     {
         $ticket = $request->input('ticket', '');
         $randstr = $request->input('randstr', '');
-        if (! $ticket || ! $randstr) {
+        if (!$ticket || !$randstr) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -485,7 +485,7 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         $verify5Token = $request->input('verify5_token', '');
-        if (! $token || ! $verify5Token) {
+        if (!$token || !$verify5Token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -521,7 +521,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateVaptcha(Request $request)
     {
         $token = $request->input('token', '');
-        if (! $token) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -560,12 +560,12 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaValidateWangyi(Request $request)
     {
         $token = $request->input('token', '');
-        if (! $token) {
+        if (!$token) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
-        if (! $secretKey) {
+        if (!$secretKey) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 
@@ -610,12 +610,12 @@ class AuthCaptchaController extends BaseAuthController
     {
         $token = $request->input('token', '');
         $authenticate = $request->input('authenticate', '');
-        if (! $token || ! $authenticate) {
+        if (!$token || !$authenticate) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $secretKey = config('admin.extensions.auth-captcha.secret_key', '');
-        if (! $secretKey) {
+        if (!$secretKey) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
         }
 
