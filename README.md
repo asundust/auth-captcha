@@ -1,5 +1,6 @@
 laravel-admin登陆 滑动验证插件 多平台支持
 ======
+![StyleCI build status](https://github.styleci.io/repos/193665404/shield) 
 laravel-admin登陆 滑动验证插件 多平台支持
 
 ### Demo演示
