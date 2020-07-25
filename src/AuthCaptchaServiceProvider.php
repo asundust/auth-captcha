@@ -11,7 +11,7 @@ class AuthCaptchaServiceProvider extends ServiceProvider
      */
     public function boot(AuthCaptcha $extension)
     {
-        if (! AuthCaptcha::boot()) {
+        if (!AuthCaptcha::boot()) {
             return;
         }
 
