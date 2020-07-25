@@ -14,8 +14,11 @@ class AuthCaptchaController extends BaseAuthController
     use ThrottlesLogins;
 
     public $captchaProvider;
+
     public $captchaAppid;
+
     public $captchaSecret;
+
     public $captchaStyle;
 
     private $providerStyles = [
@@ -76,7 +79,7 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Get Login
+     * Get Login.
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Support\Facades\Redirect|\Illuminate\View\View
      */
@@ -93,44 +96,51 @@ class AuthCaptchaController extends BaseAuthController
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'popup';
                 }
+
                 break;
             case 'geetest':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'bind';
                 }
                 $extConfig = $this->getGeetestStatus();
+
                 break;
             case 'recaptchav2':
             case 'vaptcha':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'invisible';
                 }
+
                 break;
             case 'recaptcha':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'default';
                 }
+
                 break;
             case 'verify5':
                 $extConfig['token'] = $this->getVerify5Token();
                 $this->captchaStyle = 'default';
+
                 break;
             case 'wangyi':
-                if ($this->captchaStyle === null) {
+                if (null === $this->captchaStyle) {
                     $this->captchaStyle = 'popup';
                 }
+
                 break;
             case 'yunpian':
                 if (!$this->captchaStyle) {
                     $this->captchaStyle = 'dialog';
                 }
+
                 break;
 
             default:
                 break;
         }
 
-        return view('auth-captcha::' . $this->captchaProvider . '.' . $this->providerStyles[$this->captchaProvider][$this->captchaStyle], [
+        return view('auth-captcha::'.$this->captchaProvider.'.'.$this->providerStyles[$this->captchaProvider][$this->captchaStyle], [
             'captchaAppid' => $this->captchaAppid,
             'captchaStyle' => $this->captchaStyle,
             'extConfig' => $extConfig,
@@ -138,7 +148,7 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Get Geetest Status
+     * Get Geetest Status.
      *
      * @return array
      */
@@ -153,40 +163,43 @@ class AuthCaptchaController extends BaseAuthController
             'new_captcha' => 1,
             'user_id' => '',
         ];
-        $url = 'http://api.geetest.com/register.php?' . http_build_query($params);
+        $url = 'http://api.geetest.com/register.php?'.http_build_query($params);
         $response = $this->captchaHttp()->get($url);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return $this->geetestFailProcess();
         }
-        if (strlen($contents) != 32) {
+        if (32 != strlen($contents)) {
             return $this->geetestFailProcess();
         }
+
         return $this->geetestSuccessProcess($contents);
     }
 
     /**
-     * Geetest Success Process
+     * Geetest Success Process.
      *
      * @param $challenge
+     *
      * @return array
      */
     private function geetestSuccessProcess($challenge)
     {
-        $challenge = md5($challenge . $this->captchaSecret);
+        $challenge = md5($challenge.$this->captchaSecret);
         $result = [
             'success' => 1,
             'gt' => $this->captchaAppid,
             'challenge' => $challenge,
-            'new_captcha' => 1
+            'new_captcha' => 1,
         ];
         session(['GeetestAuth-gtserver' => 1, 'GeetestAuth-user_id' => '']);
+
         return $result;
     }
 
     /**
-     * Geetest Fail Process
+     * Geetest Fail Process.
      *
      * @return array
      */
@@ -194,19 +207,20 @@ class AuthCaptchaController extends BaseAuthController
     {
         $rnd1 = md5(rand(0, 100));
         $rnd2 = md5(rand(0, 100));
-        $challenge = $rnd1 . substr($rnd2, 0, 2);
+        $challenge = $rnd1.substr($rnd2, 0, 2);
         $result = [
             'success' => 0,
             'gt' => $this->captchaAppid,
             'challenge' => $challenge,
-            'new_captcha' => 1
+            'new_captcha' => 1,
         ];
         session(['GeetestAuth-gtserver' => 0, 'GeetestAuth-user_id' => 0]);
+
         return $result;
     }
 
     /**
-     * Get Verify5 Token
+     * Get Verify5 Token.
      *
      * @return bool|string
      */
@@ -214,27 +228,29 @@ class AuthCaptchaController extends BaseAuthController
     {
         $params = [
             'appid' => $this->captchaAppid,
-            'timestamp' => now()->timestamp . '000',
+            'timestamp' => now()->timestamp.'000',
         ];
         $params['signature'] = $this->getSignature($this->captchaSecret, $params);
-        $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/getToken?' . http_build_query($params);
+        $url = 'https://'.config('admin.extensions.auth-captcha.host').'/openapi/getToken?'.http_build_query($params);
         $response = $this->captchaHttp()->get($url);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return '';
         }
         $result = json_decode($contents, true);
-        if ($result['success'] != true) {
+        if (true != $result['success']) {
             return '';
         }
+
         return $result['data']['token'];
     }
 
     /**
-     * Post Login
+     * Post Login.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed
      */
     public function postLogin(Request $request)
@@ -242,40 +258,50 @@ class AuthCaptchaController extends BaseAuthController
         switch ($this->captchaProvider) {
             case 'dingxiang':
                 return $this->captchaValidateDingxiang($request);
+
                 break;
             case 'geetest':
                 return $this->captchaValidateGeetest($request);
+
                 break;
             case 'recaptchav2':
             case 'recaptcha':
                 return $this->captchaValidateRecaptcha($request);
+
                 break;
             case 'tencent':
                 return $this->captchaValidateTencent($request);
+
                 break;
             case 'verify5':
                 return $this->captchaValidateVerify5($request);
+
                 break;
             case 'vaptcha':
                 return $this->captchaValidateVaptcha($request);
+
                 break;
             case 'wangyi':
                 return $this->captchaValidateWangyi($request);
+
                 break;
             case 'yunpian':
                 return $this->captchaValidateYunpian($request);
+
                 break;
 
             default:
                 return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
+
                 break;
         }
     }
 
     /**
-     * Dingxiang Captcha
+     * Dingxiang Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateDingxiang(Request $request)
@@ -285,36 +311,38 @@ class AuthCaptchaController extends BaseAuthController
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $tokenArr = array_filter(explode(':', $token));
-        if (count($tokenArr) != 2) {
+        if (2 != count($tokenArr)) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
         $params = [
             'appKey' => $this->captchaAppid,
             'constId' => $tokenArr[1],
-            'sign' => md5($this->captchaSecret . $tokenArr[0] . $this->captchaSecret),
+            'sign' => md5($this->captchaSecret.$tokenArr[0].$this->captchaSecret),
             'token' => $tokenArr[0],
         ];
 
         $url = 'https://cap.dingxiang-inc.com/api/tokenVerify';
-        $response = $this->captchaHttp()->get($url . '?' . http_build_query($params));
+        $response = $this->captchaHttp()->get($url.'?'.http_build_query($params));
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['success'] === true) {
+        if (true === $result['success']) {
             return $this->loginValidate($request);
         }
+
         return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
-     * Geetest Captcha
+     * Geetest Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function captchaValidateGeetest(Request $request)
@@ -326,10 +354,11 @@ class AuthCaptchaController extends BaseAuthController
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
-        if (session('GeetestAuth-gtserver') != 1) {
+        if (1 != session('GeetestAuth-gtserver')) {
             if (md5($geetestChallenge) == $geetestValidate) {
                 return $this->loginValidate($request);
             }
+
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -352,20 +381,22 @@ class AuthCaptchaController extends BaseAuthController
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
         if (is_array($result) && $result['seccode'] == md5($geetestSeccode)) {
             return $this->loginValidate($request);
         }
+
         return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
-     * Recaptcha Captcha
+     * Recaptcha Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateRecaptcha(Request $request)
@@ -381,32 +412,34 @@ class AuthCaptchaController extends BaseAuthController
             'remoteip' => $request->ip(),
         ];
 
-        $url = rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')) . '/recaptcha/api/siteverify';
+        $url = rtrim(config('admin.extensions.auth-captcha.domain', 'https://recaptcha.net')).'/recaptcha/api/siteverify';
         $response = $this->captchaHttp()->post($url, [
             'form_params' => $params,
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($this->captchaProvider == 'recaptcha') {
-            if ($result['success'] === true && $result['score'] >= config('admin.extensions.auth-captcha.score', 0.7)) {
+        if ('recaptcha' == $this->captchaProvider) {
+            if (true === $result['success'] && $result['score'] >= config('admin.extensions.auth-captcha.score', 0.7)) {
                 return $this->loginValidate($request);
             }
         } else {
-            if ($result['success'] === true) {
+            if (true === $result['success']) {
                 return $this->loginValidate($request);
             }
         }
+
         return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
     }
 
     /**
-     * Tencent Captcha
+     * Tencent Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateTencent(Request $request)
@@ -422,19 +455,19 @@ class AuthCaptchaController extends BaseAuthController
             'AppSecretKey' => $this->captchaSecret,
             'Ticket' => $ticket,
             'Randstr' => $randstr,
-            'UserIP' => $request->getClientIp()
+            'UserIP' => $request->getClientIp(),
         ];
 
         $url = 'https://ssl.captcha.qq.com/ticket/verify';
-        $response = $this->captchaHttp()->get($url . '?' . http_build_query($params));
+        $response = $this->captchaHttp()->get($url.'?'.http_build_query($params));
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['response'] != 1) {
+        if (1 != $result['response']) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -442,9 +475,10 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Verify5 Captcha
+     * Verify5 Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function captchaValidateVerify5(Request $request)
@@ -459,18 +493,18 @@ class AuthCaptchaController extends BaseAuthController
             'host' => config('admin.extensions.auth-captcha.host'),
             'verifyid' => $token,
             'token' => $verify5Token,
-            'timestamp' => now()->timestamp . '000',
+            'timestamp' => now()->timestamp.'000',
         ];
         $params['signature'] = $this->getSignature($this->captchaSecret, $params);
-        $url = 'https://' . config('admin.extensions.auth-captcha.host') . '/openapi/verify?' . http_build_query($params);
+        $url = 'https://'.config('admin.extensions.auth-captcha.host').'/openapi/verify?'.http_build_query($params);
         $response = $this->captchaHttp()->get($url);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['success'] != true) {
+        if (true != $result['success']) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -478,9 +512,10 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Vaptcha Captcha
+     * Vaptcha Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateVaptcha(Request $request)
@@ -504,11 +539,11 @@ class AuthCaptchaController extends BaseAuthController
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['success'] != 1) {
+        if (1 != $result['success']) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
 
@@ -516,9 +551,10 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Wangyi Captcha
+     * Wangyi Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateWangyi(Request $request)
@@ -539,7 +575,7 @@ class AuthCaptchaController extends BaseAuthController
             'user' => '',
             'secretId' => $this->captchaSecret,
             'version' => 'v2',
-            'timestamp' => now()->timestamp . '000',
+            'timestamp' => now()->timestamp.'000',
             'nonce' => str_random(),
         ];
 
@@ -552,11 +588,11 @@ class AuthCaptchaController extends BaseAuthController
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
 
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['result'] === true) {
+        if (true === $result['result']) {
             return $this->loginValidate($request);
         }
 
@@ -564,9 +600,10 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Yunpian Captcha
+     * Yunpian Captcha.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateYunpian(Request $request)
@@ -589,7 +626,7 @@ class AuthCaptchaController extends BaseAuthController
             'secretId' => $this->captchaSecret,
             'user' => '',
             'version' => '1.0',
-            'timestamp' => now()->timestamp . '000',
+            'timestamp' => now()->timestamp.'000',
             'nonce' => str_random(),
         ];
 
@@ -601,11 +638,11 @@ class AuthCaptchaController extends BaseAuthController
         ]);
         $statusCode = $response->getStatusCode();
         $contents = $response->getBody()->getContents();
-        if ($statusCode != 200) {
+        if (200 != $statusCode) {
             return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
         }
         $result = json_decode($contents, true);
-        if ($result['code'] === 0 && $result['msg'] == 'ok') {
+        if (0 === $result['code'] && 'ok' == $result['msg']) {
             return $this->loginValidate($request);
         }
 
@@ -613,27 +650,30 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * 生成签名信息
+     * 生成签名信息.
      *
      * @param $secretKey
      * @param $params
+     *
      * @return string
      */
-    function getSignature($secretKey, $params)
+    public function getSignature($secretKey, $params)
     {
         ksort($params);
         $str = '';
         foreach ($params as $key => $value) {
-            $str .= $key . $value;
+            $str .= $key.$value;
         }
         $str .= $secretKey;
+
         return md5($str);
     }
 
     /**
-     * Login Validate
+     * Login Validate.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function loginValidate(Request $request)
@@ -653,7 +693,7 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * Http
+     * Http.
      *
      * @return Client
      */
@@ -667,9 +707,10 @@ class AuthCaptchaController extends BaseAuthController
     }
 
     /**
-     * getErrorMessage
+     * getErrorMessage.
      *
      * @param $type
+     *
      * @return array|string|null
      */
     private function getErrorMessage($type)
@@ -677,14 +718,17 @@ class AuthCaptchaController extends BaseAuthController
         switch ($type) {
             case 'fail':
                 return __('Sliding validation failed. Please try again.');
+
                 break;
 
             case 'config':
                 return __('Config Error.');
+
                 break;
 
             default:
                 return __('Error');
+
                 break;
         }
     }
