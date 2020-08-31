@@ -249,8 +249,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Post Login.
      *
-     * @param Request $request
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed
      */
     public function postLogin(Request $request)
@@ -300,8 +298,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Dingxiang Captcha.
      *
-     * @param Request $request
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateDingxiang(Request $request)
@@ -340,8 +336,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Geetest Captcha.
-     *
-     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
@@ -395,8 +389,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Recaptcha Captcha.
      *
-     * @param Request $request
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateRecaptcha(Request $request)
@@ -438,8 +430,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Tencent Captcha.
      *
-     * @param Request $request
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     private function captchaValidateTencent(Request $request)
@@ -477,8 +467,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Verify5 Captcha.
      *
-     * @param Request $request
-     *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function captchaValidateVerify5(Request $request)
@@ -513,8 +501,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Vaptcha Captcha.
-     *
-     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
@@ -552,8 +538,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Wangyi Captcha.
-     *
-     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
@@ -601,8 +585,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Yunpian Captcha.
-     *
-     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
@@ -671,8 +653,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Login Validate.
-     *
-     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
