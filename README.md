@@ -24,7 +24,7 @@ laravel-admin登陆 滑动验证插件 多平台支持
 
 
 ### 截图
-![img](https://github.com/asundust/images/blob/master/images/auth-captcha-screenshot.png?raw=true)
+![img](https://user-images.githubusercontent.com/6573979/91679699-a631ae80-eb7b-11ea-89f1-e4ed7e4d945c.png)
 
 
 ### 安装
@@ -251,8 +251,8 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 ### 支持
 如果觉得这个项目帮你节约了时间，不妨支持一下呗！
 
-![alipay](https://raw.githubusercontent.com/asundust/images/master/images/pay_qrcode_alipay.png)
-![wechat](https://raw.githubusercontent.com/asundust/images/master/images/pay_qrcode_wechat.png)
+![alipay](https://user-images.githubusercontent.com/6573979/91679916-2c4df500-eb7c-11ea-98a7-ab740ddda77d.png)
+![wechat](https://user-images.githubusercontent.com/6573979/91679913-2b1cc800-eb7c-11ea-8915-eb0eced94aee.png)
 
 ### License
 [The MIT License (MIT)](https://opensource.org/licenses/MIT)
