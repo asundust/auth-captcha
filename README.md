@@ -8,9 +8,10 @@ laravel-admin登陆 滑动验证插件 多平台支持
 ### Demo演示
 [演示站点](https://captcha.leeay.com)
 
-### 支持
+### 支持(按照字母顺序)
 - [顶象](https://www.dingxiang-inc.com/business/captcha):heavy_check_mark:
 - [极验](http://www.geetest.com):heavy_check_mark:
+- [hCaptcha(和谷歌Recaptcha v2一样)](https://www.hcaptcha.com):heavy_check_mark:（**免费，速度一般**）
 - [Recaptcha v2(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [Recaptcha v3(谷歌)](https://developers.google.com/recaptcha):heavy_check_mark:（**国内可用，完全免费**）
 - [~~数美(暂不支持网页)~~](https://www.ishumei.com/product/bs-post-register.html)
@@ -69,6 +70,22 @@ composer require asundust/auth-captcha
 ```
 - 访问 [https://www.dingxiang-inc.com/business/captcha](https://www.dingxiang-inc.com/business/captcha)
 - [官网文档地址](http://docs.geetest.com/sensebot/deploy/server/php)
+
+#### hCaptcha
+- 配置代码如下
+```
+'auth-captcha' => [
+    'enable' => true,
+    'provider' => 'hcaptcha',
+    'style' => 'invisible', // 隐藏式: invisible 复选框: display (不填写默认invisible)
+    'appid' => '{sitekey}',
+    'secret' => '{secret}',
+],
+```
+- 访问 [https://dashboard.hcaptcha.com/overview](https://dashboard.hcaptcha.com/overview)
+- [官网文档地址(前端)显示](https://docs.hcaptcha.com/configuration)
+- [官网文档地址(前端)隐藏](https://docs.hcaptcha.com/invisible)
+- [官网文档地址(后端)](https://docs.hcaptcha.com)
 
 #### Recaptcha v2(谷歌)
 - 配置代码如下

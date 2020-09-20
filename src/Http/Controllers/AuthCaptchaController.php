@@ -34,6 +34,10 @@ class AuthCaptchaController extends BaseAuthController
             'popup' => 'login_style',
             'custom' => 'login_style',
         ],
+        'hcaptcha' => [
+            'invisible' => 'login',
+            'display' => 'login_style',
+        ],
         'recaptchav2' => [
             'invisible' => 'login',
             'display' => 'login_style',
@@ -105,6 +109,7 @@ class AuthCaptchaController extends BaseAuthController
                 $extConfig = $this->getGeetestStatus();
 
                 break;
+            case 'hcaptcha':
             case 'recaptchav2':
             case 'vaptcha':
                 if (!$this->captchaStyle) {
@@ -262,6 +267,10 @@ class AuthCaptchaController extends BaseAuthController
                 return $this->captchaValidateGeetest($request);
 
                 break;
+            case 'hcaptcha':
+                return $this->captchaValidateHCaptcha($request);
+
+                break;
             case 'recaptchav2':
             case 'recaptcha':
                 return $this->captchaValidateRecaptcha($request);
@@ -380,6 +389,41 @@ class AuthCaptchaController extends BaseAuthController
         }
         $result = json_decode($contents, true);
         if (is_array($result) && $result['seccode'] == md5($geetestSeccode)) {
+            return $this->loginValidate($request);
+        }
+
+        return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+    }
+
+    /**
+     * HCaptcha Captcha.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
+    private function captchaValidateHCaptcha(Request $request)
+    {
+        $token = $request->input('token', '');
+        if (!$token) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+
+        $params = [
+            'secret' => $this->captchaSecret,
+            'response' => $token,
+            'remoteip' => $request->ip(),
+        ];
+
+        $url = 'https://hcaptcha.com/siteverify';
+        $response = $this->captchaHttp()->post($url, [
+            'form_params' => $params,
+        ]);
+        $statusCode = $response->getStatusCode();
+        $contents = $response->getBody()->getContents();
+        if (200 != $statusCode) {
+            return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('fail')]);
+        }
+        $result = json_decode($contents, true);
+        if (true === $result['success']) {
             return $this->loginValidate($request);
         }
 
