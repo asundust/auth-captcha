@@ -253,6 +253,38 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 ### 使用
 在浏览器里打开laravel-admin登陆页
 
+### 重写登陆页
+- `config/admin.php`文件里的`auth`下的`controller`改为自己的控制器，如`App\Admin\Controllers\AuthController::class`。
+- 在`App\Admin\Controllers`下新建`AuthController`控制器，代码如下
+```
+<?php
+
+namespace App\Admin\Controllers;
+
+use Asundust\AuthCaptcha\Http\Controllers\AuthCaptchaController as BaseAuthController;
+
+class AuthController extends BaseAuthController
+{
+    public function getLogin()
+    {
+        // 原先代码在 \Asundust\AuthCaptcha\Http\Controllers\AuthCaptchaController::getLogin
+        // 这里重写自己的逻辑
+    }
+
+    public function postLogin()
+    {
+        // 原先代码在 \Asundust\AuthCaptcha\Http\Controllers\AuthCaptchaController::postLogin
+        // 这里重写自己的逻辑
+    }
+
+    // 重写其他方法 具体查看 Encore\Admin\Controllers\AuthController
+}
+```
+
+### 注意事项
+- 有些插件重写了路由可能导致插件不生效如[laravel-admin iframe-tabs](https://packagist.org/packages/ichynul/iframe-tabs)
+，可以将`config/admin.php`文件里的`auth`下的`controller`改为`Asundust\AuthCaptcha\Http\Controllers\AuthCaptchaController::class`即可。
+
 ### 未来
 - ~~加入回车键监听~~:heavy_check_mark:
 - 加入更多滑动验证码（持续添加ing）:heavy_check_mark:
