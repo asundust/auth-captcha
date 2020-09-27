@@ -25,7 +25,7 @@ laravel-admin登陆 滑动验证插件 多平台支持
 
 
 ### 截图
-![img](https://user-images.githubusercontent.com/6573979/91679699-a631ae80-eb7b-11ea-89f1-e4ed7e4d945c.png)
+![img](https://user-images.githubusercontent.com/6573979/94363320-123b0000-00b1-11eb-9357-4dfdcf88960b.gif)
 
 
 ### 安装
