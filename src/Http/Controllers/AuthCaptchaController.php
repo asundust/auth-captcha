@@ -5,14 +5,11 @@ namespace Asundust\AuthCaptcha\Http\Controllers;
 use Asundust\AuthCaptcha\AuthCaptcha;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use GuzzleHttp\Client;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Facades\Agent;
 
 class AuthCaptchaController extends BaseAuthController
 {
-    use ThrottlesLogins;
-
     public $captchaProvider;
 
     public $captchaAppid;
