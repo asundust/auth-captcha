@@ -24,7 +24,7 @@
         "php": ">=7.0.0",
         "ext-json": "*",
         "encore/laravel-admin": "~1.6",
-        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/guzzle": "^6.3||^7.2",
         "jenssegers/agent": "^2.6"
     },
     "require-dev": {
