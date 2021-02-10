@@ -195,9 +195,9 @@ composer require asundust/auth-captcha
     'ext_config' => [],
 ],
 ```
-- 访问 [https://www.yunpian.com/console/#/captcha/product](https://www.yunpian.com/console/#/captcha/product)
-- 访问 [官方使用文档地址](https://www.yunpian.com/official/document/sms/zh_CN/captcha/captcha_service)
 
+- 访问 [https://www.yunpian.com/console/#/captcha/product](https://www.yunpian.com/console/#/captcha/product)
+- 访问 [官方使用文档地址](https://www.yunpian.com/official/document/sms/zh_CN/introduction_format)
 
 ### 配置
 - 在`config/admin.php` 文件里加入上述配置好的文件。
