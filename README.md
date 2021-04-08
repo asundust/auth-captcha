@@ -21,7 +21,7 @@ laravel-admin登陆 滑动验证插件 多平台支持
 - [~~数美(暂不支持网页)~~](https://www.ishumei.com/product/bs-post-register.html)
 - [腾讯防水墙](https://cloud.tencent.com/document/product/1110/36839):heavy_check_mark:
 - [同盾](https://x.tongdun.cn/product/captcha)
-- [V5验证](https://www.verify5.com/index):heavy_check_mark:（**免费版日限500次**）
+- [V5验证](https://www.verify5.com/index):heavy_check_mark:（**免费版日限100次**）
 - [Vaptcha](https://www.vaptcha.com):heavy_check_mark:（**不完全免费，不过该验证码使用难度相对较高**）
 - [网易](http://dun.163.com/product/captcha):heavy_check_mark:
 - [云片](https://www.yunpian.com/product/captcha):heavy_check_mark:
@@ -364,6 +364,10 @@ class AuthController extends AuthCaptchaController
 ### 更新日志
 
 [CHANGE_LOG.md](CHANGE_LOG.md)
+
+### 鸣谢名单
+
+[de-memory](https://github.com/de-memory)
 
 ### 支持
 
