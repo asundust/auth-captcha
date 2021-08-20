@@ -257,6 +257,7 @@ composer require asundust/auth-captcha
 // 'host' => env('AUTH_CAPTCHA_HOST'), // 部分需要此第三个参数！！！
 // 'domain' => env('AUTH_CAPTCHA_DOMAIN'), // 部分需要此第三个参数！！！
 // 'score' => env('AUTH_CAPTCHA_SCORE'), // 部分需要此第三个参数！！！
+// 'timeout' => env('AUTH_CAPTCHA_TIMEOUT'), // 如果部分出现超时500可以修改此参数，默认5
 // 'xxxxxx' => env('AUTH_CAPTCHA_XXXXXX'), // demo
 ```
 
