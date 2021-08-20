@@ -721,7 +721,7 @@ class AuthCaptchaController extends BaseAuthController
     private function captchaHttp()
     {
         return new Client([
-            'timeout' => 5,
+            'timeout' => config('admin.extensions.auth-captcha.timeout', 5),
             'verify' => false,
             'http_errors' => false,
         ]);
