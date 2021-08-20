@@ -5,7 +5,7 @@ laravel-admin登陆 滑动验证插件 多平台支持
 
 laravel-admin登陆 滑动验证插件 多平台支持
 
-> 另有 [dcat-admin版](https://github.com/asundust/dcat-auth-captcha)
+> 另有 [Dcat-Admin版](https://github.com/asundust/dcat-auth-captcha)
 
 ### Demo演示
 
@@ -271,6 +271,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 #AUTH_CAPTCHA_HOST=xxxxxx
 #AUTH_CAPTCHA_DOMAIN=xxxxxx
 #AUTH_CAPTCHA_SCORE=xxxxxx
+#AUTH_CAPTCHA_TIMEOUT=xxxxxx
 #AUTH_CAPTCHA_XXXXXX=xxxxxx
 ```
 
