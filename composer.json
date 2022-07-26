@@ -1,6 +1,6 @@
 {
     "name": "asundust/auth-captcha",
-    "description": "Sliding captcha for Laravel-Admin auth, Multiple platform support / Laravel-Admin登陆 滑动验证插件 多平台支持",
+    "description": "Sliding captcha for Laravel-Admin auth, Multiple platform support / Laravel-Admin登录 滑动验证插件 多平台支持",
     "type": "library",
     "keywords": [
         "laravel-admin",
