@@ -1,9 +1,9 @@
-laravel-admin登陆 滑动验证插件 多平台支持
+laravel-admin登录 滑动验证插件 多平台支持
 ======
 
 ![StyleCI build status](https://github.styleci.io/repos/193665404/shield)
 
-laravel-admin登陆 滑动验证插件 多平台支持
+laravel-admin登录 滑动验证插件 多平台支持
 
 > 另有 [Dcat-Admin版](https://github.com/asundust/dcat-auth-captcha)
 
@@ -296,9 +296,9 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### 使用
 
-在浏览器里打开laravel-admin登陆页
+在浏览器里打开laravel-admin登录页
 
-### 重写登陆页
+### 重写登录页
 
 - 在`auth-captcha`增加一个`controller`配置项，并填写`App\Admin\Controllers\AuthController::class`，代码如下
 
