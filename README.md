@@ -1,8 +1,5 @@
-laravel-admin登录 滑动验证插件 多平台支持
+Laravel-Admin登录 滑动验证插件 多平台支持
 ======
-
-> laravel-admin登录 滑动验证插件 多平台支持
-
 > 另有 [Dcat-Admin版](https://github.com/asundust/dcat-auth-captcha)
 
 ![StyleCI build status](https://github.styleci.io/repos/193665404/shield)
