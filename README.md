@@ -1,11 +1,11 @@
 laravel-admin登录 滑动验证插件 多平台支持
 ======
 
+> laravel-admin登录 滑动验证插件 多平台支持
+
 ![StyleCI build status](https://github.styleci.io/repos/193665404/shield)
 <a href="https://packagist.org/packages/asundust/auth-captcha"><img src="https://img.shields.io/packagist/dt/asundust/auth-captcha" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/asundust/auth-captcha"><img src="https://img.shields.io/packagist/v/asundust/auth-captcha" alt="Latest Stable Version"></a>
-
-laravel-admin登录 滑动验证插件 多平台支持
 
 > 另有 [Dcat-Admin版](https://github.com/asundust/dcat-auth-captcha)
 
