@@ -46,6 +46,7 @@ class AuthCaptchaThrottleMiddleware extends ThrottleRequests
      * @param $key
      * @param $maxAttempts
      * @param $responseCallback
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function buildException($request, $key, $maxAttempts, $responseCallback = null)
@@ -61,9 +62,6 @@ class AuthCaptchaThrottleMiddleware extends ThrottleRequests
         return $this->captchaErrorResponse($this->getMessage());
     }
 
-    /**
-     * @return array|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Translation\Translator|string|null
-     */
     private function getMessage(): array|string|\Illuminate\Contracts\Translation\Translator|\Illuminate\Contracts\Foundation\Application|null
     {
         return __('Too Many Attempts.');
@@ -73,7 +71,6 @@ class AuthCaptchaThrottleMiddleware extends ThrottleRequests
      *CaptchaErrorResponse.
      *
      * @param $message
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function captchaErrorResponse($message): \Illuminate\Http\RedirectResponse
     {

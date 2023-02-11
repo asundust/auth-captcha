@@ -92,10 +92,9 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Get Login.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Support\Facades\Redirect|\Illuminate\View\View
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getLogin(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Support\Facades\Redirect|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+    public function getLogin(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Support\Facades\Redirect|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         if ($this->guard()->check()) {
             return redirect($this->redirectPath());
@@ -163,7 +162,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Get Geetest Status.
      *
-     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getGeetestStatus(): array
@@ -195,8 +193,6 @@ class AuthCaptchaController extends BaseAuthController
      * Geetest Success Process.
      *
      * @param $challenge
-     *
-     * @return array
      */
     private function geetestSuccessProcess($challenge): array
     {
@@ -214,8 +210,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Geetest Fail Process.
-     *
-     * @return array
      */
     private function geetestFailProcess(): array
     {
@@ -237,6 +231,7 @@ class AuthCaptchaController extends BaseAuthController
      * Get Verify5 Token.
      *
      * @return mixed|string
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getVerify5Token(): mixed
@@ -264,12 +259,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Post Login.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function postLogin(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+    public function postLogin(Request $request): RedirectResponse|\Illuminate\Http\Response
     {
         return match ($this->captchaProvider) {
             'dingxiang' => $this->captchaValidateDingxiang($request),
@@ -288,12 +281,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Dingxiang Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateDingxiang(Request $request): \Illuminate\Http\RedirectResponse
+    private function captchaValidateDingxiang(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -330,8 +321,8 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Geetest Captcha.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -385,12 +376,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * HCaptcha Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateHCaptcha(Request $request): \Illuminate\Http\RedirectResponse
+    private function captchaValidateHCaptcha(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -423,12 +412,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Recaptcha Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateRecaptcha(Request $request): \Illuminate\Http\RedirectResponse
+    private function captchaValidateRecaptcha(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -467,12 +454,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Tencent Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateTencent(Request $request): \Illuminate\Http\RedirectResponse
+    private function captchaValidateTencent(Request $request): RedirectResponse
     {
         $ticket = $request->input('ticket', '');
         $randstr = $request->input('randstr', '');
@@ -507,12 +492,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Verify5 Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function captchaValidateVerify5(Request $request): \Illuminate\Http\RedirectResponse
+    public function captchaValidateVerify5(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         $verify5Token = $request->input('verify5_token', '');
@@ -545,12 +528,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Vaptcha Captcha.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateVaptcha(Request $request): \Illuminate\Http\RedirectResponse
+    private function captchaValidateVaptcha(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -585,8 +566,8 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Wangyi Captcha.
      *
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -635,8 +616,6 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Yunpian Captcha.
      *
-     * @param Request $request
-     * @return RedirectResponse
      * @throws GuzzleException
      * @throws ValidationException
      */
@@ -688,8 +667,6 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @param $secretKey
      * @param $params
-     *
-     * @return string
      */
     public function getSignature($secretKey, $params): string
     {
@@ -706,11 +683,9 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Login Validate.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    private function loginValidate(Request $request): \Illuminate\Http\RedirectResponse
+    private function loginValidate(Request $request): RedirectResponse
     {
         $this->loginValidator($request->all())->validate();
 
@@ -728,8 +703,6 @@ class AuthCaptchaController extends BaseAuthController
 
     /**
      * Http.
-     *
-     * @return Client
      */
     private function captchaHttp(): Client
     {
@@ -744,8 +717,6 @@ class AuthCaptchaController extends BaseAuthController
      * getErrorMessage.
      *
      * @param $type
-     *
-     * @return array|string|null
      */
     private function getErrorMessage($type): array|string|null
     {
