@@ -21,9 +21,9 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=8.0.2",
         "ext-json": "*",
-        "encore/laravel-admin": "~1.6",
+        "encore/laravel-admin": "^1.6",
         "guzzlehttp/guzzle": "^6.3||^7.2",
         "jenssegers/agent": "^2.6"
     },

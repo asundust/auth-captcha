@@ -258,6 +258,7 @@ composer require asundust/auth-captcha
 // 'domain' => env('AUTH_CAPTCHA_DOMAIN'), // 部分需要此第三个参数！！！
 // 'score' => env('AUTH_CAPTCHA_SCORE'), // 部分需要此第三个参数！！！
 // 'timeout' => env('AUTH_CAPTCHA_TIMEOUT'), // 如果部分出现超时500可以修改此参数，默认5
+// 'login_try_throttle' => env('AUTH_CAPTCHA_LOGIN_TRY_THROTTLE'), // 登录频率限制，默认空，参数规则参考Laravel自带的
 // 'xxxxxx' => env('AUTH_CAPTCHA_XXXXXX'), // demo
 ```
 
@@ -272,6 +273,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 #AUTH_CAPTCHA_DOMAIN=xxxxxx
 #AUTH_CAPTCHA_SCORE=xxxxxx
 #AUTH_CAPTCHA_TIMEOUT=xxxxxx
+#AUTH_CAPTCHA_LOGIN_TRY_THROTTLE=xxxxxx
 #AUTH_CAPTCHA_XXXXXX=xxxxxx
 ```
 
@@ -281,6 +283,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 "Sliding validation failed. Please try again.": "滑动验证未通过，请重试。",
 "Please complete the validation.": "请完成验证。",
 "Config Error.": "配置错误。"
+"Too Many Attempts.": "尝试次数太多。"
 ```
 
 - 额外配置说明，参考顶象的一个配置
@@ -296,7 +299,7 @@ AUTH_CAPTCHA_SECRET=xxxxxx
 
 ### 使用
 
-在浏览器里打开laravel-admin登录页
+在浏览器里打开Laravel-Admin登录页
 
 ### 重写登录页
 
@@ -340,7 +343,7 @@ class AuthController extends AuthCaptchaController
 
 ### 注意事项
 
-- 有些插件重写了路由可能导致插件不生效如[laravel-admin iframe-tabs](https://packagist.org/packages/ichynul/iframe-tabs)，
+- 有些插件重写了路由可能导致插件不生效如[Laravel-Admin iframe-tabs](https://packagist.org/packages/ichynul/iframe-tabs)，
   在`auth-captcha`增加一个`controller`配置项，并填写`Asundust\AuthCaptcha\Http\Controllers\AuthCaptchaController::class`，代码如下
 
 ```

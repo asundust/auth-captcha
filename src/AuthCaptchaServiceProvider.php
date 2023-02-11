@@ -7,9 +7,10 @@ use Illuminate\Support\ServiceProvider;
 class AuthCaptchaServiceProvider extends ServiceProvider
 {
     /**
-     * {@inheritdoc}
+     * @param AuthCaptcha $extension
+     * @return void
      */
-    public function boot(AuthCaptcha $extension)
+    public function boot(AuthCaptcha $extension): void
     {
         if (!AuthCaptcha::boot()) {
             return;

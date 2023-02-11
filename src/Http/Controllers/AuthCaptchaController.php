@@ -3,22 +3,27 @@
 namespace Asundust\AuthCaptcha\Http\Controllers;
 
 use Asundust\AuthCaptcha\AuthCaptcha;
+use Asundust\AuthCaptcha\Http\Middleware\AuthCaptchaThrottleMiddleware;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Jenssegers\Agent\Facades\Agent;
 
 class AuthCaptchaController extends BaseAuthController
 {
-    public $captchaProvider;
+    public ?string $captchaProvider;
 
-    public $captchaAppid;
+    public ?string $captchaAppid;
 
-    public $captchaSecret;
+    public ?string $captchaSecret;
 
-    public $captchaStyle;
+    public ?string $captchaStyle;
 
-    private $providerStyles = [
+    private array $providerStyles = [
         'dingxiang' => [
             'popup' => 'login',
             'embed' => 'login_style',
@@ -77,14 +82,20 @@ class AuthCaptchaController extends BaseAuthController
         $this->captchaAppid = AuthCaptcha::config('appid');
         $this->captchaSecret = AuthCaptcha::config('secret');
         $this->captchaStyle = AuthCaptcha::config('style');
+
+        $throttle = AuthCaptcha::config('login_try_throttle');
+        if ($throttle) {
+            $this->middleware(AuthCaptchaThrottleMiddleware::class.':'.$throttle)->only('postLogin');
+        }
     }
 
     /**
      * Get Login.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Support\Facades\Redirect|\Illuminate\View\View
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Support\Facades\Redirect|\Illuminate\View\View
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getLogin()
+    public function getLogin(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Support\Facades\Redirect|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
     {
         if ($this->guard()->check()) {
             return redirect($this->redirectPath());
@@ -153,8 +164,9 @@ class AuthCaptchaController extends BaseAuthController
      * Get Geetest Status.
      *
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function getGeetestStatus()
+    private function getGeetestStatus(): array
     {
         $clientType = Agent::isMobile() ? 'h5' : 'web';
         session(['GeetestAuth-client_type' => $clientType]);
@@ -186,7 +198,7 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return array
      */
-    private function geetestSuccessProcess($challenge)
+    private function geetestSuccessProcess($challenge): array
     {
         $challenge = md5($challenge.$this->captchaSecret);
         $result = [
@@ -205,7 +217,7 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return array
      */
-    private function geetestFailProcess()
+    private function geetestFailProcess(): array
     {
         $rnd1 = md5(rand(0, 100));
         $rnd2 = md5(rand(0, 100));
@@ -224,9 +236,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Get Verify5 Token.
      *
-     * @return bool|string
+     * @return mixed|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function getVerify5Token()
+    private function getVerify5Token(): mixed
     {
         $params = [
             'appid' => $this->captchaAppid,
@@ -241,7 +254,7 @@ class AuthCaptchaController extends BaseAuthController
             return '';
         }
         $result = json_decode($contents, true);
-        if (true != $result['success']) {
+        if (!$result['success']) {
             return '';
         }
 
@@ -251,62 +264,36 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Post Login.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|mixed
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function postLogin(Request $request)
+    public function postLogin(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
     {
-        switch ($this->captchaProvider) {
-            case 'dingxiang':
-                return $this->captchaValidateDingxiang($request);
-
-                break;
-            case 'geetest':
-                return $this->captchaValidateGeetest($request);
-
-                break;
-            case 'hcaptcha':
-                return $this->captchaValidateHCaptcha($request);
-
-                break;
-            case 'recaptchav2':
-            case 'recaptcha':
-                return $this->captchaValidateRecaptcha($request);
-
-                break;
-            case 'tencent':
-                return $this->captchaValidateTencent($request);
-
-                break;
-            case 'verify5':
-                return $this->captchaValidateVerify5($request);
-
-                break;
-            case 'vaptcha':
-                return $this->captchaValidateVaptcha($request);
-
-                break;
-            case 'wangyi':
-                return $this->captchaValidateWangyi($request);
-
-                break;
-            case 'yunpian':
-                return $this->captchaValidateYunpian($request);
-
-                break;
-
-            default:
-                return back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]);
-
-                break;
-        }
+        return match ($this->captchaProvider) {
+            'dingxiang' => $this->captchaValidateDingxiang($request),
+            'geetest' => $this->captchaValidateGeetest($request),
+            'hcaptcha' => $this->captchaValidateHCaptcha($request),
+            'recaptchav2', 'recaptcha' => $this->captchaValidateRecaptcha($request),
+            'tencent' => $this->captchaValidateTencent($request),
+            'verify5' => $this->captchaValidateVerify5($request),
+            'vaptcha' => $this->captchaValidateVaptcha($request),
+            'wangyi' => $this->captchaValidateWangyi($request),
+            'yunpian' => $this->captchaValidateYunpian($request),
+            default => back()->withInput()->withErrors(['captcha' => $this->getErrorMessage('config')]),
+        };
     }
 
     /**
      * Dingxiang Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateDingxiang(Request $request)
+    private function captchaValidateDingxiang(Request $request): \Illuminate\Http\RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -343,7 +330,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Geetest Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function captchaValidateGeetest(Request $request)
     {
@@ -395,9 +385,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * HCaptcha Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateHCaptcha(Request $request)
+    private function captchaValidateHCaptcha(Request $request): \Illuminate\Http\RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -430,9 +423,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Recaptcha Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateRecaptcha(Request $request)
+    private function captchaValidateRecaptcha(Request $request): \Illuminate\Http\RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -471,9 +467,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Tencent Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateTencent(Request $request)
+    private function captchaValidateTencent(Request $request): \Illuminate\Http\RedirectResponse
     {
         $ticket = $request->input('ticket', '');
         $randstr = $request->input('randstr', '');
@@ -508,9 +507,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Verify5 Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function captchaValidateVerify5(Request $request)
+    public function captchaValidateVerify5(Request $request): \Illuminate\Http\RedirectResponse
     {
         $token = $request->input('token', '');
         $verify5Token = $request->input('verify5_token', '');
@@ -543,9 +545,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Vaptcha Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function captchaValidateVaptcha(Request $request)
+    private function captchaValidateVaptcha(Request $request): \Illuminate\Http\RedirectResponse
     {
         $token = $request->input('token', '');
         if (!$token) {
@@ -580,7 +585,10 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Wangyi Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
     private function captchaValidateWangyi(Request $request)
     {
@@ -601,7 +609,7 @@ class AuthCaptchaController extends BaseAuthController
             'secretId' => $this->captchaSecret,
             'version' => 'v2',
             'timestamp' => now()->timestamp.'000',
-            'nonce' => str_random(),
+            'nonce' => Str::random(),
         ];
 
         $params['signature'] = $this->getSignature($secretKey, $params);
@@ -627,9 +635,12 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Yunpian Captcha.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws GuzzleException
+     * @throws ValidationException
      */
-    private function captchaValidateYunpian(Request $request)
+    private function captchaValidateYunpian(Request $request): RedirectResponse
     {
         $token = $request->input('token', '');
         $authenticate = $request->input('authenticate', '');
@@ -650,7 +661,7 @@ class AuthCaptchaController extends BaseAuthController
             'user' => '',
             'version' => '1.0',
             'timestamp' => now()->timestamp.'000',
-            'nonce' => str_random(),
+            'nonce' => Str::random(),
         ];
 
         $params['signature'] = $this->getSignature($secretKey, $params);
@@ -680,7 +691,7 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return string
      */
-    public function getSignature($secretKey, $params)
+    public function getSignature($secretKey, $params): string
     {
         ksort($params);
         $str = '';
@@ -695,9 +706,11 @@ class AuthCaptchaController extends BaseAuthController
     /**
      * Login Validate.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
-    private function loginValidate(Request $request)
+    private function loginValidate(Request $request): \Illuminate\Http\RedirectResponse
     {
         $this->loginValidator($request->all())->validate();
 
@@ -718,7 +731,7 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return Client
      */
-    private function captchaHttp()
+    private function captchaHttp(): Client
     {
         return new Client([
             'timeout' => config('admin.extensions.auth-captcha.timeout', 5),
@@ -734,23 +747,12 @@ class AuthCaptchaController extends BaseAuthController
      *
      * @return array|string|null
      */
-    private function getErrorMessage($type)
+    private function getErrorMessage($type): array|string|null
     {
-        switch ($type) {
-            case 'fail':
-                return __('Sliding validation failed. Please try again.');
-
-                break;
-
-            case 'config':
-                return __('Config Error.');
-
-                break;
-
-            default:
-                return __('Error');
-
-                break;
-        }
+        return match ($type) {
+            'fail' => __('Sliding validation failed. Please try again.'),
+            'config' => __('Config Error.'),
+            default => __('Error'),
+        };
     }
 }
