@@ -24,7 +24,7 @@ class AuthCaptchaServiceProvider extends ServiceProvider
         }
 
         $this->app->booted(function () {
-            AuthCaptcha::routes(__DIR__.'/../routes/web.php');
+            AuthCaptcha::routes(__DIR__ . '/../routes/web.php');
         });
     }
 }
