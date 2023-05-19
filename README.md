@@ -384,3 +384,11 @@ class AuthController extends AuthCaptchaController
 ### License
 
 [The MIT License (MIT)](https://opensource.org/licenses/MIT)
+
+## 🧚‍♀️ 欢迎星标 🌟
+
+![Star](https://api.star-history.com/svg?repos=asundust/auth-captcha&type=Date)
+
+### 🧚‍♀️ 访问量统计
+
+![Visitor Count](https://profile-counter.glitch.me/asundust/count.svg)
